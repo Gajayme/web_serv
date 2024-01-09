@@ -1,10 +1,13 @@
 NAME = webserv
 
-SRCS = 0
+SRCS = $(wildcard src/*.cpp)
 
-HEADERS  = 0
+HEADERS  = $(wildcard src/*.hpp)
 
-OBJS = $(SRCS:.cpp=.o)
+OBJS = $(patsubst src/%.cpp, obj/%.o, $(SRCS))
+
+obj/%.o: src/%.cpp
+	$(CC) $(CFLAGS) -c $< -o $@
 
 CXX = c++
 
@@ -17,18 +20,19 @@ RESET = "\033[0m"
 BLACK = "\033[1m\033[37m"
 
 all:
-  @$(MAKE) $(NAME) -j5
+	@$(MAKE) $(NAME) -j5
+
 $(NAME) : $(OBJS) $(HEADERS)
-  $(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME)
-  @echo $(BLACK)-webserv compiled $(RESET)
+	$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME)
+	@echo $(BLACK)-webserv compiled $(RESET)
 
 clean:
-  $(RM) $(OBJS)
+	$(RM) $(OBJS)
 
 fclean: clean
-  $(RM) $(NAME)
+	$(RM) $(NAME)
 
-re:   fclean all
+re: fclean all
 
 .PHONY: all clean fclean re
 
