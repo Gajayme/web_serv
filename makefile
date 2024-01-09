@@ -22,7 +22,10 @@ BLACK = "\033[1m\033[37m"
 all:
 	@$(MAKE) $(NAME) -j5
 
-$(NAME) : $(OBJS) $(HEADERS)
+makeObjDir:
+	mkdir obj
+
+$(NAME) : makeObjDir $(OBJS) $(HEADERS)
 	$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME)
 	@echo $(BLACK)-webserv compiled $(RESET)
 

@@ -1,5 +1,6 @@
 *.out
+*.o
 .vscode
 beej_guide
 http_from_scratch
-
+webserv
