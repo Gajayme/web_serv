@@ -23,6 +23,7 @@ all:
 	@$(MAKE) $(NAME) -j5
 
 makeObjDir:
+	rm -rf obj
 	mkdir obj
 
 $(NAME) : makeObjDir $(OBJS) $(HEADERS)
