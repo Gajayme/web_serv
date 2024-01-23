@@ -14,11 +14,13 @@
 #include "ServConst.hpp"
 #include "array"
 
+// TODO нужен конструктор копирования и присваивания
 Server::Server():
 listeningBacklog_(constants::listeningBacklog),
 fdCount_(0),
 listener_(),
 ip_(),
+//TODO лучше запушить первый элемент в теле конструктора
 pfds_(1) {
 	listener_ = getListenerSocket();
 	if (listener_ == -1) {
@@ -27,6 +29,7 @@ pfds_(1) {
 	}
 	pfds_[0].fd = listener_;
 	pfds_[0].events = POLLIN; //!< Report ready to read on incoming connection
+	//TODO можно избавится от этого использую размер вектора
 	fdCount_ = 1; //!< For the listener
 }
 
@@ -155,14 +158,15 @@ void Server::addToPfds(const int newfd) {
 	++fdCount_;
 }
 
-void Server::delFromPfds(const int i) {
+void Server::delFromPfds(const int idx) {
 	//! Copy the one from the end over this one
-	pfds_[i] = pfds_.back();
+	// TODO использовать свап
+	pfds_[idx] = pfds_.back();
 	pfds_.pop_back();
 }
 
-
-	void * Server::getInAddr(struct sockaddr *sa) {
+// TODO переписать на ссылки и добавить касты в ++ стиле
+void * Server::getInAddr(struct sockaddr *sa) {
 	if (sa->sa_family == AF_INET) {
 		return &(((struct sockaddr_in*)sa)->sin_addr);
 	}

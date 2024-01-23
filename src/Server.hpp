@@ -25,7 +25,7 @@ private:
 	void addToPfds(int newfd);
 
 	//! Remove fd from container
-	void delFromPfds(int i);
+	void delFromPfds(int idx);
 
 
 	//! Get sockaddr, IPv4 or IPv6:
@@ -39,7 +39,6 @@ private:
 	int listener_;
 	//! Number of connections allowed on the incoming queue
 	int listeningBacklog_;
-	// TODO убедиться в правильности
 	//! Fds of current connections
 	std::vector<struct pollfd> pfds_;
 };
