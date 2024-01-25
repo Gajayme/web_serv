@@ -1,26 +1,17 @@
-#include <ostream>
+#include "Server.hpp"
+#include <string>
+#include <iostream>
 
 namespace Color {
+	enum color{
+		RED      = 31,
+		GREEN    = 32,
+		YELLOW   = 33,
+		BLUE     = 34,
+		DEFAULT  = 39,
+	};
 
-enum Code {
-	FG_RED      = 31,
-	FG_GREEN    = 32,
-	FG_BLUE     = 34,
-	FG_DEFAULT  = 39,
-	BG_RED      = 41,
-	BG_GREEN    = 42,
-	BG_BLUE     = 44,
-	BG_DEFAULT  = 49
-};
-
-class Modifier {
-	Code code;
-
-public:
-	Modifier(Code pCode) : code(pCode) {}
-
-	friend std::ostream& operator<<(std::ostream& os, const Modifier& mod) {
-		return os << "\033[" << mod.code << "m";
-	}
-};
-} // namespace colour
+	void colour_out(color col, std::string * str) {
+	std::cout << "\033[1;"<<static_cast<int>(col)<<"m"<< * str << "\033[0m\n";
+}
+}
