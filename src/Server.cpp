@@ -14,23 +14,20 @@
 #include "ServConst.hpp"
 #include "array"
 
-// TODO нужен конструктор копирования и присваивания
+// TODO нужен конструктор копирования и присваивания (нужна ли их реализация)
 Server::Server():
 listeningBacklog_(constants::listeningBacklog),
-fdCount_(0),
 listener_(),
 ip_(),
-//TODO лучше запушить первый элемент в теле конструктора
-pfds_(1) {
+pfds_() {
 	listener_ = getListenerSocket();
 	if (listener_ == -1) {
 		std::cout << stderr << "error getting listening socket" << std::endl;
 		exit(1);
 	}
-	pfds_[0].fd = listener_;
-	pfds_[0].events = POLLIN; //!< Report ready to read on incoming connection
-	//TODO можно избавится от этого использую размер вектора
-	fdCount_ = 1; //!< For the listener
+	pfds_.push_back(pollfd());
+	pfds_.back().fd = listener_;
+	pfds_.back().events = POLLIN; //!< Report ready to read on incoming connection
 }
 
 Server::~Server() {
@@ -48,14 +45,14 @@ int Server::runServer() {
 	socklen_t addrlen;
 
 	while (true) {
-		std::cout << "pfds_ size = " << pfds_.size() << " " << fdCount_ << std::endl;
-		int poll_count = poll(pfds_.data(), fdCount_, -1);
+		std::cout << "pfds_ size = " << pfds_.size() << " " << pfds_.size() << std::endl;
+		int poll_count = poll(pfds_.data(), pfds_.size(), -1);
 		if (poll_count == -1) {
 			perror("poll");
 			exit(1);
 		}
 		//! Run through the existing connections looking for data to read
-		for (size_t i = 0; i < fdCount_; ++i) {
+		for (size_t i = 0; i < pfds_.size(); ++i) {
 			//! Check if someone's ready to read
 			if (pfds_[i].revents & POLLIN) { //!< We got one!!
 				//! If listener is ready to read, handle new connection
@@ -71,7 +68,7 @@ int Server::runServer() {
 						std::cout << "pollserver: new connection from " <<
 								  inet_ntop(remoteaddr.ss_family, getInAddr((struct sockaddr *) &remoteaddr),
 											remoteIP.data(), INET6_ADDRSTRLEN) <<
-								  "on socket " << newfd << std::endl;
+								  " on socket " << newfd << std::endl;
 					}
 				} else {
 					//! If not the listener, we're just a regular client
@@ -155,7 +152,6 @@ void Server::addToPfds(const int newfd) {
 	pfds_.push_back(pollfd());
 	pfds_.back().fd = newfd;
 	pfds_.back().events = POLLIN; //! Check ready-to-read
-	++fdCount_;
 }
 
 void Server::delFromPfds(const int idx) {
@@ -165,10 +161,9 @@ void Server::delFromPfds(const int idx) {
 	pfds_.pop_back();
 }
 
-// TODO переписать на ссылки и добавить касты в ++ стиле
 void * Server::getInAddr(struct sockaddr *sa) {
 	if (sa->sa_family == AF_INET) {
-		return &(((struct sockaddr_in*)sa)->sin_addr);
+		return &((reinterpret_cast<sockaddr_in*>(sa))->sin_addr);
 	}
-	return &(((struct sockaddr_in6*)sa)->sin6_addr);
+	return &((reinterpret_cast<sockaddr_in6*>(sa))->sin6_addr);
 }
