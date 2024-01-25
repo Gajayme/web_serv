@@ -11,7 +11,7 @@ namespace Color {
 		DEFAULT  = 39,
 	};
 
-	void colour_out(color col, std::string * str) {
-	std::cout << "\033[1;"<<static_cast<int>(col)<<"m"<< * str << "\033[0m\n";
+	void colour_out(color col, std::string & str) {
+	std::cout << "\033[1;"<<static_cast<int>(col)<<"m"<< str << "\033[0m\n";
 }
 }
