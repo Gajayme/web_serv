@@ -1,6 +1,8 @@
 #pragma once
 
 #include <iostream>
+#include <vector>
+#include <poll.h>
 
 #define PORT "9034"   // Port we're listening on
 
