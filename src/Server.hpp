@@ -18,6 +18,12 @@ public:
 
 
 private:
+	//! Forbid copy
+	Server(const Server &other);
+
+	//! Forbid assignment
+	Server &operator=(const Server &other);
+
 	//! Return a listening socket
 	int getListenerSocket(void) const;
 
@@ -33,8 +39,6 @@ private:
 
 	//! Server IP address
 	int ip_;
-	//! Current amount of connections
-	int fdCount_;
 	//! Listening socket descriptor
 	int listener_;
 	//! Number of connections allowed on the incoming queue
