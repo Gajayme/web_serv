@@ -2,7 +2,10 @@
 
 #include <iostream>
 #include <vector>
+#include <unordered_map>
 #include <poll.h>
+
+#include "Client.h"
 
 #define PORT "9034"   // Port we're listening on
 
@@ -17,7 +20,6 @@ public:
 
 	//! Start webserver
 	int runServer();
-
 
 private:
 	//! Forbid copy
@@ -35,9 +37,14 @@ private:
 	//! Remove fd from container
 	void delFromPfds(int idx);
 
-
 	//! Get sockaddr, IPv4 or IPv6:
 	void *getInAddr(struct sockaddr *sa);
+
+	//! Accept new incoming connection;
+	void acceptNewConnection();
+
+	//! Get data from incoming connection
+	void handleIncomingRequest(size_t idx);
 
 	//! Server IP address
 	int ip_;

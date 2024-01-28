@@ -32,20 +32,9 @@ Server::~Server() {
 	std::cout << "Destroyed" <<  std::endl;
 }
 
-void Server::handleListener() {
-
-}
-
 int Server::runServer() {
 
 	utils::colour_out(utils::GREEN, "Starting server");
-
-	int newfd;        //!< Newly accept()ed socket descriptor
-	struct sockaddr_storage remoteaddr; //!< Client address
-	// TODO надо понять, почему корраптятся последние символы
-	std::array<char, constants::buffSize> buf; //!< Buffer for client data
-	std::array<char, INET6_ADDRSTRLEN> remoteIP;
-	socklen_t addrlen;
 
 	while (true) {
 		int poll_count = poll(pfds_.data(), pfds_.size(), -1);
@@ -59,33 +48,11 @@ int Server::runServer() {
 			if (pfds_[i].revents & POLLIN) { //!< We got one!!
 				//! If listener is ready to read, handle new connection
 				if (pfds_[i].fd == listener_) {
-					addrlen = sizeof remoteaddr;
-					newfd = accept(listener_, (struct sockaddr *) &remoteaddr, &addrlen);
-					if (newfd == -1) {
-						perror("accept");
-					} else {
-						addToPfds(newfd);
-						std::string clientAddr(inet_ntop(remoteaddr.ss_family, getInAddr((struct sockaddr *) &remoteaddr), remoteIP.data(), INET6_ADDRSTRLEN));
-						std::cout << "pollserver: new connection from " << clientAddr << " on socket " << newfd << std::endl;
-					}
-				} else {
-					//! If not the listener, we're just a regular client
-					int nbytes = recv(pfds_[i].fd, buf.data(), buf.size(), 0);
-					if (nbytes <= 0) {
-						//! Got error or connection closed by client
-						if (nbytes == 0) {
-							//! Connection closed
-							printf("pollserver: socket %d hung up\n", pfds_[i].fd);
-							std::cout << "pollserver: socket " << pfds_[i].fd << " hung up" << std::endl;
-						} else {
-							perror("recv");
-						}
-						close(pfds_[i].fd); //! Bye!
-						delFromPfds(i);
-					} else {
-						//TODO надо разобраться, как парсить запрос до конца
-						std::cout << buf.data() << std::endl;
-					}
+					acceptNewConnection();
+				}
+				//! If not the listener, we're just a regular client
+				else {
+					handleIncomingRequest(i);
 				} //! END handle data from client
 			} //! END got ready-to-read from poll()
 		} //! END looping through file descriptors
@@ -152,4 +119,42 @@ void * Server::getInAddr(struct sockaddr *sa) {
 		return &((reinterpret_cast<sockaddr_in*>(sa))->sin_addr);
 	}
 	return &((reinterpret_cast<sockaddr_in6*>(sa))->sin6_addr);
+}
+
+
+void Server::acceptNewConnection() {
+	int newfd;
+	struct sockaddr_storage remoteaddr;
+	std::array<char, INET6_ADDRSTRLEN> remoteIP;
+	socklen_t addrlen;
+	addrlen = sizeof remoteaddr;
+	newfd = accept(listener_, (struct sockaddr *) &remoteaddr, &addrlen);
+	if (newfd == -1) {
+		perror("accept");
+	} else {
+		addToPfds(newfd);
+		std::string clientAddr(inet_ntop(remoteaddr.ss_family, getInAddr((struct sockaddr *) &remoteaddr), remoteIP.data(), INET6_ADDRSTRLEN));
+		std::cout << "pollserver: new connection from " << clientAddr << " on socket " << newfd << std::endl;
+	}
+}
+
+void Server::handleIncomingRequest(const size_t idx) {
+	std::array<char, constants::buffSize> buf; //!< Buffer for client data
+	int nbytes = recv(pfds_[idx].fd, buf.data(), buf.size(), 0);
+	if (nbytes <= 0) {
+		//! Got error or connection closed by client
+		if (nbytes == 0) {
+			//! Connection closed
+			std::cout << "pollserver: socket " << pfds_[idx].fd << " hung up" << std::endl;
+		} else {
+			perror("recv");
+		}
+		close(pfds_[idx].fd); //! Bye!
+		delFromPfds(idx);
+	} else {
+		for (auto it = buf.begin(); it != buf.end(); ++it) {
+			std::cout << *it;
+		}
+
+	}
 }
