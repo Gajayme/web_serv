@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,13 +6,13 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
-#include <poll.h>
+#include <array>
 
 #include "Server.hpp"
 #include "ServConst.hpp"
-#include "array"
+#include "Utils.h"
 
-// TODO нужен конструктор копирования и присваивания (нужна ли их реализация)
+
 Server::Server():
 listeningBacklog_(constants::listeningBacklog),
 listener_(),
@@ -34,18 +32,22 @@ Server::~Server() {
 	std::cout << "Destroyed" <<  std::endl;
 }
 
+void Server::handleListener() {
+
+}
+
 int Server::runServer() {
 
-	std::cout << "Running server"<<  std::endl;
+	utils::colour_out(utils::GREEN, "Starting server");
 
 	int newfd;        //!< Newly accept()ed socket descriptor
 	struct sockaddr_storage remoteaddr; //!< Client address
+	// TODO надо понять, почему корраптятся последние символы
 	std::array<char, constants::buffSize> buf; //!< Buffer for client data
 	std::array<char, INET6_ADDRSTRLEN> remoteIP;
 	socklen_t addrlen;
 
 	while (true) {
-		std::cout << "pfds_ size = " << pfds_.size() << " " << pfds_.size() << std::endl;
 		int poll_count = poll(pfds_.data(), pfds_.size(), -1);
 		if (poll_count == -1) {
 			perror("poll");
@@ -58,21 +60,17 @@ int Server::runServer() {
 				//! If listener is ready to read, handle new connection
 				if (pfds_[i].fd == listener_) {
 					addrlen = sizeof remoteaddr;
-					std::cout << "before accept" << std::endl;
 					newfd = accept(listener_, (struct sockaddr *) &remoteaddr, &addrlen);
-					std::cout << "after accept" << std::endl;
 					if (newfd == -1) {
 						perror("accept");
 					} else {
 						addToPfds(newfd);
-						std::cout << "pollserver: new connection from " <<
-								  inet_ntop(remoteaddr.ss_family, getInAddr((struct sockaddr *) &remoteaddr),
-											remoteIP.data(), INET6_ADDRSTRLEN) <<
-								  " on socket " << newfd << std::endl;
+						std::string clientAddr(inet_ntop(remoteaddr.ss_family, getInAddr((struct sockaddr *) &remoteaddr), remoteIP.data(), INET6_ADDRSTRLEN));
+						std::cout << "pollserver: new connection from " << clientAddr << " on socket " << newfd << std::endl;
 					}
 				} else {
 					//! If not the listener, we're just a regular client
-					int nbytes = recv(pfds_[i].fd, buf.data(), constants::buffSize, 0);
+					int nbytes = recv(pfds_[i].fd, buf.data(), buf.size(), 0);
 					if (nbytes <= 0) {
 						//! Got error or connection closed by client
 						if (nbytes == 0) {
@@ -85,17 +83,8 @@ int Server::runServer() {
 						close(pfds_[i].fd); //! Bye!
 						delFromPfds(i);
 					} else {
-						//! We got some good data from a client
-						for (int j = 0; j < pfds_.size(); ++j) {
-							//! Send to everyone!
-							int dest_fd = pfds_[j].fd;
-							//! Except the listener and ourselves
-							if (dest_fd != listener_ && dest_fd != pfds_[i].fd) {
-								if (send(dest_fd, buf.data(), nbytes, 0) == -1) {
-									perror("send");
-								}
-							}
-						}
+						//TODO надо разобраться, как парсить запрос до конца
+						std::cout << buf.data() << std::endl;
 					}
 				} //! END handle data from client
 			} //! END got ready-to-read from poll()
@@ -105,8 +94,6 @@ int Server::runServer() {
 }
 
 int Server::getListenerSocket(void) const {
-	std::cout << "Getting listener socket" << std::endl;
-
 	int listener;     //!< Listening socket descriptor
 	int yes = 1;      //!< For setsockopt() SO_REUSEADDR, below
 	int rv;
@@ -156,7 +143,6 @@ void Server::addToPfds(const int newfd) {
 
 void Server::delFromPfds(const int idx) {
 	//! Copy the one from the end over this one
-	// TODO использовать свап
 	pfds_[idx] = pfds_.back();
 	pfds_.pop_back();
 }
