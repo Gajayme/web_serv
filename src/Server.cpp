@@ -1,6 +1,6 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -14,10 +14,10 @@
 
 
 Server::Server():
-listeningBacklog_(constants::listeningBacklog),
 listener_(),
 ip_(),
-pfds_() {
+pfds_(),
+clients_() {
 	listener_ = getListenerSocket();
 	if (listener_ == -1) {
 		std::cout << stderr << "error getting listening socket" << std::endl;
@@ -60,58 +60,22 @@ int Server::runServer() {
 	return 0;
 }
 
-int Server::getListenerSocket(void) const {
-	int listener;     //!< Listening socket descriptor
-	int yes = 1;      //!< For setsockopt() SO_REUSEADDR, below
-	int rv;
-	struct addrinfo hints, *ai, *p;
-	//! Get us a socket and bind it
-	memset(&hints, 0, sizeof hints);
-	hints.ai_family = AF_UNSPEC;
-	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_flags = AI_PASSIVE;
-	if ((rv = getaddrinfo(NULL, PORT, &hints, &ai)) != 0) {
-		std::cout << stderr << "selectserver: " << gai_strerror(rv) << std::endl;
-		exit(1);
-	}
-
-	for(p = ai; p != NULL; p = p->ai_next) {
-		listener = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
-		if (listener < 0) {
-			continue;
-		}
-		//! Lose the pesky "address already in use" error message
-		setsockopt(listener, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
-		if (bind(listener, p->ai_addr, p->ai_addrlen) < 0) {
-			close(listener);
-			continue;
-		}
-		break;
-	}
-	freeaddrinfo(ai); //!< All done with this
-	//! If we got here, it means we didn't get bound
-	if (p == NULL) {
-		return -1;
-	}
-	//! Listen
-	if (listen(listener, listeningBacklog_) == -1) {
-		return -1;
-	}
-
-	return listener;
-}
-
 void Server::addToPfds(const int newfd) {
+	std::cout << "adding to pfds" << std::endl;
 	//! If we don't have room, add more space in the pfds array
 	pfds_.push_back(pollfd());
 	pfds_.back().fd = newfd;
 	pfds_.back().events = POLLIN; //! Check ready-to-read
+	clients_[newfd] = Client();
+	std::cout << "Added. Clients size = " << clients_.size() << std::endl;
 }
 
 void Server::delFromPfds(const int idx) {
 	//! Copy the one from the end over this one
+	clients_.erase(pfds_[idx].fd);
 	pfds_[idx] = pfds_.back();
 	pfds_.pop_back();
+	std::cout << "Deleted. Clients size = " << clients_.size() << std::endl;
 }
 
 void * Server::getInAddr(struct sockaddr *sa) {
@@ -157,4 +121,45 @@ void Server::handleIncomingRequest(const size_t idx) {
 		}
 
 	}
+}
+
+int getListenerSocket() {
+	int listener;     //!< Listening socket descriptor
+	int yes = 1;      //!< For setsockopt() SO_REUSEADDR, below
+	int rv;
+	struct addrinfo hints, *ai, *p;
+	//! Get us a socket and bind it
+	memset(&hints, 0, sizeof hints);
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_flags = AI_PASSIVE;
+	if ((rv = getaddrinfo(nullptr, PORT, &hints, &ai)) != 0) {
+		std::cout << stderr << "selectserver: " << gai_strerror(rv) << std::endl;
+		exit(1);
+	}
+
+	for(p = ai; p != nullptr; p = p->ai_next) {
+		listener = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
+		if (listener < 0) {
+			continue;
+		}
+		//! Lose the pesky "address already in use" error message
+		setsockopt(listener, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
+		if (bind(listener, p->ai_addr, p->ai_addrlen) < 0) {
+			close(listener);
+			continue;
+		}
+		break;
+	}
+	freeaddrinfo(ai); //!< All done with this
+	//! If we got here, it means we didn't get bound
+	if (p == nullptr) {
+		return -1;
+	}
+	//! Listen
+	if (listen(listener, constants::listeningBacklog) == -1) {
+		return -1;
+	}
+
+	return listener;
 }

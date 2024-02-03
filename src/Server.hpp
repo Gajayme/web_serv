@@ -2,56 +2,86 @@
 
 #include <iostream>
 #include <vector>
-#include <unordered_map>
+#include <map>
 #include <poll.h>
 
 #include "Client.h"
 
 #define PORT "9034"   // Port we're listening on
 
-
 class Server {
 public:
-	//! Constructor
+
+	/**
+	 * @brief Constructor.
+	 */
 	Server();
 
-	//! Destructor
+	/**
+	 * @brief Destructor.
+	 */
 	~Server();
 
-	//! Start webserver
+	/**
+	 * @brief Start server.
+	 */
 	int runServer();
 
 private:
-	//! Forbid copy
+	/**
+	 * @brief Forbid copy.
+	 * @param other Another server object
+	 */
 	Server(const Server &other);
 
-	//! Forbid assignment
+	/**
+	 * @brief Forbid assignment.
+	 * @param other Another server object
+	 */
 	Server &operator=(const Server &other);
 
-	//! Return a listening socket
-	int getListenerSocket(void) const;
-
-	//! Add a new file descriptor to the set
+	/**
+	 * @brief Add new connection to connections container.
+	 * @param newfd new connection fd
+	 */
 	void addToPfds(int newfd);
 
-	//! Remove fd from container
+	/**
+	 * @brief Remove connection from connection container.
+	 * @param newfd connection to remove
+	 */
 	void delFromPfds(int idx);
 
-	//! Get sockaddr, IPv4 or IPv6:
+	/**
+	 * @brief Get addr of incoming connection.
+	 * @param sa struct to hold whatever ip4/ip6 connection addr
+	 */
 	void *getInAddr(struct sockaddr *sa);
 
-	//! Accept new incoming connection;
+	/**
+	 * @brief Accept incoming connection.
+	 */
 	void acceptNewConnection();
 
-	//! Get data from incoming connection
+	/**
+	 * @brief Handle data from incoming connection.
+	 * @param idx index of connection to get data from.
+	 */
 	void handleIncomingRequest(size_t idx);
 
 	//! Server IP address
 	int ip_;
 	//! Listening socket descriptor
 	int listener_;
-	//! Number of connections allowed on the incoming queue
-	int listeningBacklog_;
 	//! Fds of current connections
 	std::vector<struct pollfd> pfds_;
+	//! Connected clients
+	std::map<int, Client> clients_;
 };
+
+
+/**
+ * @brief Create listening socket.
+ * @return Listening socket fd.
+ */
+int getListenerSocket();

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Server.hpp"
 #include <string>
 #include <iostream>
