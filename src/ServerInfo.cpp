@@ -1,12 +1,6 @@
 #include "ServerInfo.h"
 
-//const std::string &ip, const std::string &port, const std::string &name, int maxBodySize
 ServerInfo::ServerInfo() {
-//ip_(ip),
-//port_(port),
-//name_(name),
-//clientMaxBodySize_(maxBodySize)
-
 }
 
 ServerInfo::~ServerInfo() {}
@@ -26,4 +20,5 @@ ServerInfo &ServerInfo::operator=(const ServerInfo &other) {
 	port_ = other.port_;
 	name_ = other.name_;
 	clientMaxBodySize_ = other.clientMaxBodySize_;
+	return  *this;
 }

@@ -1,4 +1,5 @@
-#include "Server.hpp"
+#include "Server.h"
+
 #include "ConfigParser.h"
 
 int main(int argc, char **argv) {
@@ -7,7 +8,7 @@ int main(int argc, char **argv) {
 		exit(1);
 	}
 
-	ConfigParser configParser(argv[1]);
+	ConfigParser configParser();
 
 	Server serv;
 	serv.runServer();

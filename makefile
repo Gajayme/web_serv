@@ -2,7 +2,7 @@ NAME = webserv
 
 SRCS = $(wildcard src/*.cpp)
 
-HEADERS  = $(wildcard src/*.hpp)
+HEADERS  = $(wildcard src/*.h)
 
 OBJS = $(patsubst src/%.cpp, obj/%.o, $(SRCS))
 

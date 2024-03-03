@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <fstream>
+#include "ServerInfo.h"
 #include "Utils.h"
 
 namespace {
@@ -36,9 +37,8 @@ void ConfigParser::parseLine(std::string &line) {
 
 
 	if (line.rfind(SERVER, 0)) {
-
 		servers_.emplace_back(ServerInfo());
-	} else if () {
+	}
 
 	}
 }

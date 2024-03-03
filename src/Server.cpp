@@ -8,8 +8,8 @@
 #include <netdb.h>
 #include <array>
 
-#include "Server.hpp"
-#include "ServConst.hpp"
+#include "Server.h"
+#include "ServConst.h"
 #include "Utils.h"
 
 

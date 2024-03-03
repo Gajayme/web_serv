@@ -1,9 +1,10 @@
 #pragma once
 
-#include "Server.hpp"
+#include <vector>
 #include <string>
 #include <iostream>
 #include <cctype>
+
 
 namespace utils {
 
@@ -15,14 +16,10 @@ namespace utils {
 		DEFAULT  = 39,
 	};
 
-	void colour_out(Colors col, const std::string &str) {
-		std::cout << "\033[1;"<<static_cast<int>(col)<<"m"<< str << "\033[0m" << std::endl;
-	}
+	void colour_out(Colors col, const std::string &s);
 
-	void tolowerString(std::string &str) {
-		for (std::string::iterator it = str.begin(); it != str.end(); ++it) {
-			*it = static_cast<char>(tolower(*it));
-		}
-	}
+	void tolowerString(std::string &s);
+
+	std::vector<std::string> split(const std::string &s, std::string delimiter);
 
 } // namespace Utils
