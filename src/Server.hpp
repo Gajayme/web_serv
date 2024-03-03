@@ -50,13 +50,7 @@ private:
 	 * @brief Remove connection from connection container.
 	 * @param newfd connection to remove
 	 */
-	void delFromPfds(int idx);
-
-	/**
-	 * @brief Get addr of incoming connection.
-	 * @param sa struct to hold whatever ip4/ip6 connection addr
-	 */
-	void *getInAddr(struct sockaddr *sa);
+	void delFromPfds(size_t idx);
 
 	/**
 	 * @brief Accept incoming connection.
@@ -85,3 +79,9 @@ private:
  * @return Listening socket fd.
  */
 int getListenerSocket();
+
+/**
+ * @brief Get addr of incoming connection.
+ * @param sa struct to hold whatever ip4/ip6 connection addr
+ */
+void *getInAddr(struct sockaddr *sa);

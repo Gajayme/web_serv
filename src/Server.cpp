@@ -29,7 +29,7 @@ clients_() {
 }
 
 Server::~Server() {
-	std::cout << "Destroyed" <<  std::endl;
+	std::cout << "Destroying server" <<  std::endl;
 }
 
 int Server::runServer() {
@@ -70,21 +70,13 @@ void Server::addToPfds(const int newfd) {
 	std::cout << "Added. Clients size = " << clients_.size() << std::endl;
 }
 
-void Server::delFromPfds(const int idx) {
+void Server::delFromPfds(const size_t idx) {
 	//! Copy the one from the end over this one
 	clients_.erase(pfds_[idx].fd);
 	pfds_[idx] = pfds_.back();
 	pfds_.pop_back();
 	std::cout << "Deleted. Clients size = " << clients_.size() << std::endl;
 }
-
-void * Server::getInAddr(struct sockaddr *sa) {
-	if (sa->sa_family == AF_INET) {
-		return &((reinterpret_cast<sockaddr_in*>(sa))->sin_addr);
-	}
-	return &((reinterpret_cast<sockaddr_in6*>(sa))->sin6_addr);
-}
-
 
 void Server::acceptNewConnection() {
 	int newfd;
@@ -104,7 +96,7 @@ void Server::acceptNewConnection() {
 
 void Server::handleIncomingRequest(const size_t idx) {
 	std::array<char, constants::buffSize> buf; //!< Buffer for client data
-	int nbytes = recv(pfds_[idx].fd, buf.data(), buf.size(), 0);
+	ssize_t nbytes = recv(pfds_[idx].fd, buf.data(), buf.size(), 0);
 	if (nbytes <= 0) {
 		//! Got error or connection closed by client
 		if (nbytes == 0) {
@@ -162,4 +154,12 @@ int getListenerSocket() {
 	}
 
 	return listener;
+}
+
+
+void *getInAddr(struct sockaddr *sa) {
+	if (sa->sa_family == AF_INET) {
+		return &((reinterpret_cast<sockaddr_in*>(sa))->sin_addr);
+	}
+	return &((reinterpret_cast<sockaddr_in6*>(sa))->sin6_addr);
 }
