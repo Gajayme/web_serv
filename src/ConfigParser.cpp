@@ -6,15 +6,20 @@
 #include "Utils.h"
 
 namespace {
-	std::string DEFAULT_CONFIG_PATH("/Users/georgii/School_21/web_serv/configs/default.conf");
-	std::string SERVER("server");
-	std::string NAME("server_name");
-	std::string LISTEN("listen");
-	std::string HOST("host");
-	std::string BODY_SIZE("client_max_body_size");
+
+void configError(const std::string &line) {
+	std::cout << "Invalid config format: " << line << std::endl;
+	exit(1);
+}
+
 } // namespace
 
-ConfigParser::ConfigParser() {}
+ConfigParser::ConfigParser():
+configScope_(ConfigScopeGlobal),
+brackets_(),
+servers_() {
+
+}
 
 void ConfigParser::parseConfig(const std::string &path) {
 	std::ifstream config;
@@ -32,16 +37,42 @@ void ConfigParser::parseConfig(const std::string &path) {
 	config.close();
 }
 
+
+bool ConfigParser::isSeverScope(const std::vector<std::string> &toParse) {
+	std::string fullString;
+	for (std::vector<std::string>::const_iterator it = toParse.begin(); it != toParse.end(); ++it) {
+		fullString += *it;
+	}
+	return !brackets_.empty() && fullString == (SERVER+OPENBRACKET);
+}
+
 void ConfigParser::parseLine(std::string &line) {
-	utils::tolowerString(line);
-
-
-	if (line.rfind(SERVER, 0)) {
-		servers_.emplace_back(ServerInfo());
+	std::string stringToParse(line);
+	utils::trim(stringToParse);
+	utils::tolowerString(stringToParse);
+	if (line.empty()) {
+		return;
 	}
 
+	if (configScope_ == ConfigScopeGlobal) {
+		std::vector<std::string> splitLine = utils::split(line, WHITESPACE);
+		if (!isSeverScope(splitLine)) {
+			configError(line);
+		}
+		else {
+			configScope_ = ConfigScopeServer;
+			servers_.push_back(ServerInfo());
+			brackets_.push(OPENBRACKET);
+		}
+
+	} else if (configScope_ == ConfigScopeServer) {
+		//TODO
+	} else if (configScope_ == ConfigScopeLocation) {
+		//TODO
 	}
 }
+
+
 
 
 ConfigParser::~ConfigParser() {

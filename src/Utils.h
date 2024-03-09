@@ -20,6 +20,10 @@ namespace utils {
 
 	void tolowerString(std::string &s);
 
+	 void trim(std::string &s);
+
 	std::vector<std::string> split(const std::string &s, std::string delimiter);
+
+	std::vector<std::string> split(const std::string &s, char delimiter);
 
 } // namespace Utils
