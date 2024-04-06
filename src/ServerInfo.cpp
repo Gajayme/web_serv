@@ -1,6 +1,19 @@
 #include "ServerInfo.h"
+#include "iostream"
 
-ServerInfo::ServerInfo() {
+/**
+ * @brief Print server info error.
+ * @param error error description.
+ */
+void configError(const std::string error = "") {
+	std::cout << "ServerInfo: " << error << std::endl;
+}
+
+ServerInfo::ServerInfo():
+ip_(),
+port_(),
+name_(),
+clientMaxBodySize_() {
 }
 
 ServerInfo::~ServerInfo() {}
@@ -21,4 +34,32 @@ ServerInfo &ServerInfo::operator=(const ServerInfo &other) {
 	name_ = other.name_;
 	clientMaxBodySize_ = other.clientMaxBodySize_;
 	return  *this;
+}
+
+void ServerInfo::setIp(std::string ip) {
+	if (ip_.hasValue())
+		configError("ip already set");
+	ip_ = ip;
+}
+
+void ServerInfo::setPort(std::string port) {
+	if (port_.hasValue())
+		configError("port already set");
+	port_ = port;
+}
+
+void ServerInfo::setName(std::string name) {
+	if (name_.hasValue())
+		configError("name already set");
+	name_ = name;
+}
+
+void ServerInfo::setMaxBodySize(size_t maxBodySize) {
+	if (clientMaxBodySize_.hasValue())
+		configError("client max body size already set");
+	clientMaxBodySize_ = maxBodySize;
+}
+
+bool ServerInfo::checkServerInfo() {
+	return (ip_.hasValue() && port_.hasValue() && clientMaxBodySize_.hasValue());
 }

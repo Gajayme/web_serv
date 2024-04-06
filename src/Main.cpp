@@ -8,10 +8,7 @@ int main(int argc, char **argv) {
 		exit(1);
 	}
 
-	ConfigParser configParser;
-	configParser.parseConfig();
-
-//	Server serv;
-//	serv.runServer();
+	Server serv;
+	serv.runServer();
 	return 0;
 }
