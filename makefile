@@ -19,14 +19,19 @@ RM = rm -rf
 RESET = "\033[0m"
 BLACK = "\033[1m\033[37m"
 
-all:
+OBJS_DIR = "./obj"
+
+all: $(NAME)
 	@$(MAKE) $(NAME) -j5
 
 makeObjDir:
-	rm -rf obj
-	mkdir obj
+	@if [ ! -d $(OBJS_DIR) ]; then \
+		mkdir $(OBJS_DIR); \
+    fi
 
-$(NAME) : makeObjDir $(OBJS) $(HEADERS)
+
+$(NAME) : $(OBJS) $(HEADERS)
+	$(makeObjDir)
 	$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME)
 	@echo $(BLACK)-webserv compiled $(RESET)
 
