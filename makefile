@@ -7,7 +7,7 @@ HEADERS  = $(wildcard src/*.h)
 OBJS = $(patsubst src/%.cpp, obj/%.o, $(SRCS))
 
 obj/%.o: src/%.cpp
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CXX) $(CFLAGS) -c $< -o $@
 
 CXX = c++
 
