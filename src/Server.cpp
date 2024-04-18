@@ -11,6 +11,7 @@
 #include "Server.h"
 #include "ServConst.h"
 #include "Utils.h"
+#include "Http.h"
 
 
 Server::Server():
@@ -108,9 +109,8 @@ void Server::handleIncomingRequest(const size_t idx) {
 		close(pfds_[idx].fd); //! Bye!
 		delFromPfds(idx);
 	} else {
-		for (auto it = buf.begin(); it != buf.end(); ++it) {
-			std::cout << *it;
-		}
+
+		(void)HttpRequest::create(buf.data());  // idk why but buf[nbytes] == '\0'
 
 	}
 }
