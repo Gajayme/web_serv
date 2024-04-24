@@ -9,10 +9,10 @@ void configError(const std::string error = "") {
 	std::cout << "ServerInfo: " << error << std::endl;
 }
 
-ServerInfo::ServerInfo():
+ServerInfo::ServerInfo(const std::string &defaultName):
 ip_(),
 port_(),
-name_(),
+name_(defaultName),
 clientMaxBodySize_() {
 }
 
@@ -62,4 +62,12 @@ void ServerInfo::setMaxBodySize(size_t maxBodySize) {
 
 bool ServerInfo::checkServerInfo() {
 	return (ip_.hasValue() && port_.hasValue() && clientMaxBodySize_.hasValue());
+}
+
+std::ostream& operator<< (std::ostream &out, const ServerInfo &serverInfo) {
+	out << "Server " << serverInfo.name_.valueOr("NoName") << " info:" << std::endl << //
+	"ip: " << serverInfo.ip_.valueOr("undefined") << std::endl << //
+	"port: " << serverInfo.port_.valueOr("undefined") << std::endl <<
+	"client max body size: " << serverInfo.clientMaxBodySize_.valueOr(0) << std::endl;
+	return out;
 }

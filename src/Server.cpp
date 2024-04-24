@@ -15,8 +15,8 @@
 
 
 Server::Server():
-listener_(),
 ip_(),
+listener_(),
 pfds_(),
 clients_() {
 	listener_ = getListenerSocket();
@@ -110,7 +110,7 @@ void Server::handleIncomingRequest(const size_t idx) {
 		delFromPfds(idx);
 	} else {
 
-		(void)HttpRequest::create(buf.data());  // idk why but buf[nbytes] == '\0'
+//		(void)HttpRequest::create(buf.data());  // idk why but buf[nbytes] == '\0'
 
 	}
 }

@@ -7,7 +7,7 @@
 
 #include "Client.h"
 
-#define PORT "9034"   // Port we're listening on
+#define PORT "9034"   // Port we're listening on.
 
 class Server {
 public:

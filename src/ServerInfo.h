@@ -6,7 +6,7 @@
 
 class ServerInfo {
 public:
-	ServerInfo();
+	ServerInfo(const std::string &defaultName);
 	~ServerInfo();
 	ServerInfo(const ServerInfo &other);
 	ServerInfo &operator=(const ServerInfo &other);
@@ -41,9 +41,17 @@ public:
  	 */
 	bool checkServerInfo();
 
+	/**
+	 * @brief Overloading of cout operator.
+	 * @param out standard output stream.
+	 * @param serverInfo Server info object.
+	 * @return standard output stream.
+	 */
+	friend std::ostream& operator<< (std::ostream &out, const ServerInfo &serverInfo);
+
 	private:
 
-	Optional<std::string> ip_;  //!< server ip
+	Optional<std::string> ip_;  //!< server ip.
 	Optional<std::string> port_; //!< server port
 	Optional<std::string> name_; //!< server name
 	Optional<size_t> clientMaxBodySize_; //!< server max body size

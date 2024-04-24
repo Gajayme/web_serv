@@ -27,7 +27,7 @@ Client &Client::operator=(const Client &other) {
 }
 
 bool Client::parseRequestChunk(const char *data) {
-	(void *)data;
+	(void)data;
 	std::cout << "Parsing request" << std::endl;
 	return false;
 }

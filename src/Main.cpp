@@ -1,15 +1,16 @@
 #include "Server.h"
 
 #include "ConfigParser.h"
+#include "string"
 
-int main(int argc, char **argv) {
+int main() {
 
-	if (argc != 2) {
-		std::cout << "Invalid amount of arguments" << std::endl;
-		exit(1);
-	}
+	std::string defaultConfig("./configs/default.conf");
 
-	Server serv;
-	serv.runServer();
+	ConfigParser configParser;
+	configParser.parseConfig(defaultConfig);
+
+//	Server serv;
+//	serv.runServer();
 	return 0;
 }

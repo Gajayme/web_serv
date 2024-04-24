@@ -9,6 +9,7 @@
 
 namespace {
 	std::string DEFAULT_CONFIG_PATH("/Users/georgii/School_21/web_serv/configs/default.conf");
+	std::string DEFAULT_SERVER_NAME("default_");
 	std::string SERVER("server");
 	std::string SERVER_NAME("server_name");
 	std::string LISTEN("listen");
@@ -17,16 +18,29 @@ namespace {
 	std::string	OPEN_BRACKET("{");
 	std::string	CLOSE_BRACKET("}");
 	std::string	WHITESPACE(" ");
+	// TODO надо сделать так, чтобы ключи и значения в конфиге отделялись пробелами, а не двоеточиями
 	std::string	SEMICOLON(":");
+	std::string ZERO("0");
+	std::string HASHTAG("#");
 }
 
 class ConfigParser {
 
 public:
+	/**
+	 * @brief Constructor.
+	 */
 	ConfigParser();
+
+	/**
+	 * @brief Destructor.
+	 */
 	~ConfigParser();
 
-
+	/**
+	 * @brief Parse config.
+	 * @param path Path to config file
+	 */
 	void parseConfig(const std::string &path = DEFAULT_CONFIG_PATH);
 
 private:
@@ -37,15 +51,47 @@ private:
 		ConfigScopeLocation, // Inside location section
 	};
 
+	/**
+	 * @brief Forbid copy.
+	 * @param other Config parser object.
+	 */
 	ConfigParser(const ConfigParser &other);
-	ConfigParser &operator=(const ConfigParser &other);
-	void parseGlobalScope(const std::string &line);
-	void parseServerScope(const std::string &line);
-	void parseLine(const std::string &line);
 
-	ConfigScope configScope_;
-	std::vector<ServerInfo> servers_;
-	std::stack<std::string> scopeStack_;
+	/**
+	 * @brief Forbid assignment.
+	 * @param other Config parser object.
+	 */
+	ConfigParser &operator=(const ConfigParser &other);
+
+	/**
+	 * @brief Parse config line.
+	 * @param line Config line to parse.
+	 */
+	void parseLine(std::string &line);
+
+	/**
+	 * @brief Parse global scope line.
+	 * @param line Line to parse.
+	 */
+	void parseGlobalScope(const std::string &line);
+
+	/**
+	 * @brief Parse server scope line.
+	 * @param line Line to parse.
+	 */
+	void parseServerScope(const std::string &line);
+
+	/**
+	 * @brief Generate default name for server.
+	 * @return Generated unique name.
+	 */
+	std::string generateServerDefaultName();
+
+
+	ConfigScope configScope_; //!< Current parse scope.
+	std::vector<ServerInfo> servers_; //!< Containers with servers.
+	// TODO нужно ли нам это
+	std::stack<std::string> scopeStack_; //!< Stack of scope values.
 };
 
 

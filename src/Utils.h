@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include <cctype>
+#include <stack>
 
 
 namespace utils {
@@ -20,38 +21,19 @@ namespace utils {
 
 	void tolowerString(std::string &s);
 
-	void ltrim(std::string &s);
-	void rtrim(std::string &s);
 	void trim(std::string &s);
 
-	std::vector<std::string> split(const std::string &s, const std::string delimiter, size_t limit = 0);
-
-	std::vector<std::string> splitAndTrim(const std::string &s, std::string delimiter, size_t limit = 0);
+	std::vector<std::string> split(const std::string &s, const std::string &delimiter);
 
 	bool isStringDigit(const std::string &s);
 
 	bool ft_isspace(char c);
 
-	template<class InputIt, class UnaryPred>
-	InputIt ft_find_if(InputIt first, InputIt last, UnaryPred p) {
-		for (; first != last; ++first) {
-			if (p(*first))
-				return first;
-		}
-		return last;
+	template <typename T>
+	void clear_stack(std::stack<T> &stackToClear) {
+	while (!stackToClear.empty()) {
+		stackToClear.pop();
 	}
-
-	template<class ForwardIt, class UnaryPred>
-	ForwardIt ft_remove_if(ForwardIt first, ForwardIt last, UnaryPred p) {
-		first = ft_find_if(first, last, p);
-		if (first != last) {
-			for (ForwardIt i = first; ++i != last;) {
-				if (!p(*i))
-					*first++ = *i;
-			}
-		}
-		return first;
-	}
-
+}
 
 } // namespace Utils

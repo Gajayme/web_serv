@@ -1,6 +1,4 @@
 #include "Utils.h"
-#include <algorithm>
-#include <cctype>
 
 namespace utils {
 
@@ -14,55 +12,36 @@ void tolowerString(std::string &s) {
 	}
 }
 
-// trim from start (in place)
-void ltrim(std::string &s) 
-{
-	struct c98etokaif
-	{
-		bool operator()(unsigned char ch) {return !std::isspace(ch);}
-	} lambda;
-
-    s.erase(s.begin(), std::find_if(s.begin(), s.end(), lambda));
+void trim(std::string &s) {
+	std::string::const_iterator itBegin = s.cbegin();
+	std::string::const_iterator itEnd = s.cend();
+	while (itBegin < itEnd) {
+		if (!std::isspace(*itBegin) && !std::isspace(*itEnd)) {
+			break;
+		}
+		if (std::isspace(*itBegin) ) {
+			++itBegin;
+		}
+		if (std::isspace(*itEnd)) {
+			-- itEnd;
+		}
+	}
+	s = std::string(itBegin, itEnd);
 }
 
-// trim from end (in place)
-void rtrim(std::string &s) 
-{
-	struct c98etokaif
-	{
-		bool operator()(unsigned char ch) {return !std::isspace(ch);}
-	} lambda;
 
-    s.erase(std::find_if(s.rbegin(), s.rend(), lambda).base(), s.end());
-}
-
-void trim(std::string &s)
-{
-	rtrim(s);
-	ltrim(s);
-}
-
-std::vector<std::string> split(const std::string &s, const std::string delimiter, size_t limit) 
-{
+std::vector<std::string> split(const std::string &s, const std::string &delimiter) {
 	size_t pos_start = 0, pos_end, delim_len = delimiter.length();
 	std::string token;
 	std::vector<std::string> res;
-	for (size_t i = 0; (!limit || i < limit) && ((pos_end = s.find(delimiter, pos_start)) != std::string::npos); ++i)
-	{
-		token = s.substr(pos_start, pos_end - pos_start);
+	while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
+		token = s.substr (pos_start, pos_end - pos_start);
 		pos_start = pos_end + delim_len;
 		res.push_back (token);
 	}
-	res.push_back (s.substr (pos_start));
-	return res;
-}
-
-std::vector<std::string> splitAndTrim(const std::string &s, const std::string delimiter, size_t limit) 
-{
-	std::vector<std::string> res = split(s, delimiter, limit);
-	for (size_t i = 0; i < res.size(); ++i) trim(res[i]);
-	return res;
-}
+		res.push_back (s.substr (pos_start));
+		return res;
+	}
 
 bool isStringDigit(const std::string &s) {
 	for(size_t i = 0; i < s.size(); ++i)

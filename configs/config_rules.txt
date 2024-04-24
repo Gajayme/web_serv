@@ -1,0 +1,27 @@
+Keywords:
+
+"server" - define new server, each server should contain values: server_name, listen, host, client_max_body_size.
+"server_name" - server name (if not defined "default_server_N" will be set)
+"listen" - port on which server will be listening for the new connections.
+"host" - server ip
+"client_max_body_size" - max body size of client request
+
+Style:
+
+1. Each server should be declared on new line.
+2. Server content should be declared within brackets "{ }"
+3. Open bracket should be on seme line with server declaration "server {"
+4. Close bracket "}" should be typed on new line
+5. It's forbidden to declare server inside other server
+6. Keys (server_name, listen, host, client_max_body_size) and their values should be separated by one semicolon.
+7. No additional signs allowed (except those that are parts of values)
+8. Comment starts with "#" symbol. All text after will be interpreted as comment.
+
+Values format:
+
+server_name:
+host:
+listen:
+client_max_body_size:
+
+

@@ -6,15 +6,17 @@ HEADERS  = $(wildcard src/*.h)
 
 OBJS = $(patsubst src/%.cpp, obj/%.o, $(SRCS))
 
+CXX = g++
+
+CXXFLAGS = -Wall -Wextra -Werror -std=c++17 -g3
+
 obj/%.o: src/%.cpp $(HEADERS)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
-
-CXXFLAGS = -std=c++11 -g3
-// CXXFLAGS += -Werror -Wall -Wextra
 
 RM = rm -rf
 
 RESET = "\033[0m"
+
 BLACK = "\033[1m\033[37m"
 
 OBJS_DIR = "./obj"
@@ -26,7 +28,9 @@ makeObjDir:
 		mkdir $(OBJS_DIR); \
     fi
 
-$(NAME) : makeObjDir $(OBJS) 
+
+$(NAME) : $(OBJS) 	Makefile
+	$(makeObjDir)
 	$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME)
 	@echo $(BLACK)-webserv compiled $(RESET)
 
@@ -38,5 +42,5 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all clean fclean re makeObjDir
+.PHONY: all clean fclean re
 
