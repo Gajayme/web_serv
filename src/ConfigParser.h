@@ -45,10 +45,10 @@ public:
 
 private:
 
-	enum ConfigScope {
-		ConfigScopeGlobal, // Outside server section
-		ConfigScopeServer, // Inside server section
-		ConfigScopeLocation, // Inside location section
+	enum Context {
+		ContextGlobal, // Outside server section
+		ContextServer, // Inside server section
+		ContextLocation, // Inside location section
 	};
 
 	/**
@@ -70,16 +70,16 @@ private:
 	void parseLine(std::string &line);
 
 	/**
-	 * @brief Parse global scope line.
+	 * @brief Parse global context line.
 	 * @param line Line to parse.
 	 */
-	void parseGlobalScope(const std::string &line);
+	void parseGlobalContext(const std::string &line);
 
 	/**
-	 * @brief Parse server scope line.
+	 * @brief Parse server context line.
 	 * @param line Line to parse.
 	 */
-	void parseServerScope(const std::string &line);
+	void parseServerContext(const std::string &line);
 
 	/**
 	 * @brief Generate default name for server.
@@ -88,10 +88,8 @@ private:
 	std::string generateServerDefaultName();
 
 
-	ConfigScope configScope_; //!< Current parse scope.
+	Context context_; //!< Current parse context.
 	std::vector<ServerInfo> servers_; //!< Containers with servers.
-	// TODO нужно ли нам это
-	std::stack<std::string> scopeStack_; //!< Stack of scope values.
 };
 
 

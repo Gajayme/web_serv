@@ -13,20 +13,15 @@ void tolowerString(std::string &s) {
 }
 
 void trim(std::string &s) {
-	std::string::const_iterator itBegin = s.cbegin();
-	std::string::const_iterator itEnd = s.cend();
-	while (itBegin < itEnd) {
-		if (!std::isspace(*itBegin) && !std::isspace(*itEnd)) {
-			break;
-		}
-		if (std::isspace(*itBegin) ) {
-			++itBegin;
-		}
-		if (std::isspace(*itEnd)) {
-			-- itEnd;
-		}
-	}
-	s = std::string(itBegin, itEnd);
+	size_t i = 0;
+	while (isspace(s[i]))
+		i++;
+	s = s.substr(i, s.length() - i);
+
+	i = s.length() - 1;
+	while (isspace(s[i]))
+		i--;
+	s = s.substr(0, i + 1);
 }
 
 
@@ -35,13 +30,15 @@ std::vector<std::string> split(const std::string &s, const std::string &delimite
 	std::string token;
 	std::vector<std::string> res;
 	while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
-		token = s.substr (pos_start, pos_end - pos_start);
+		token = s.substr(pos_start, pos_end - pos_start);
 		pos_start = pos_end + delim_len;
 		res.push_back (token);
+		// Note. Made this to correct splitting lines with multiple delimiters going one by one
+		pos_start = s.find_first_not_of(delimiter, pos_start);
 	}
-		res.push_back (s.substr (pos_start));
-		return res;
-	}
+	res.push_back (s.substr (pos_start));
+	return res;
+}
 
 bool isStringDigit(const std::string &s) {
 	for(size_t i = 0; i < s.size(); ++i)

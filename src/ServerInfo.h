@@ -53,6 +53,6 @@ public:
 
 	Optional<std::string> ip_;  //!< server ip.
 	Optional<std::string> port_; //!< server port
-	Optional<std::string> name_; //!< server name
+	Optional<std::string> name_; //!< custom server name
 	Optional<size_t> clientMaxBodySize_; //!< server max body size
 };

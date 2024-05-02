@@ -10,10 +10,10 @@ Style:
 
 1. Each server should be declared on new line.
 2. Server content should be declared within brackets "{ }"
-3. Open bracket should be on seme line with server declaration "server {"
+3. Open bracket should be on seme line with new context declaration. For example: "server {"
 4. Close bracket "}" should be typed on new line
 5. It's forbidden to declare server inside other server
-6. Keys (server_name, listen, host, client_max_body_size) and their values should be separated by one semicolon.
+6. Keys (server_name, listen, host, client_max_body_size) and their values should be separated by whitespace.
 7. No additional signs allowed (except those that are parts of values)
 8. Comment starts with "#" symbol. All text after will be interpreted as comment.
 

@@ -47,15 +47,14 @@ void removeComment(std::string &s) {
 } // namespace
 
 ConfigParser::ConfigParser():
-		configScope_(),
-		servers_(),
-		scopeStack_() {
+		context_(),
+		servers_() {
 }
 
 ConfigParser::~ConfigParser() {}
 
 void ConfigParser::parseConfig(const std::string &path) {
-	configScope_ = ConfigScopeGlobal;
+	context_ = ContextGlobal;
 	std::ifstream config;
 	config.open(path);
 
@@ -77,48 +76,46 @@ void ConfigParser::parseLine(std::string &line) {
 	if (line.empty()) {
 		return;
 	}
-	if (configScope_ == ConfigScopeGlobal) {
-		parseGlobalScope(line);
-	} else if (configScope_ == ConfigScopeServer) {
-		parseServerScope(line);
-	} else if (configScope_ == ConfigScopeLocation) {
+	if (context_ == ContextGlobal) {
+		parseGlobalContext(line);
+	} else if (context_ == ContextServer) {
+		parseServerContext(line);
+	} else if (context_ == ContextLocation) {
 		// TODO implement
 		exit (1);
 	}
 }
 
 
-void ConfigParser::parseGlobalScope(const std::string &line) {
+void ConfigParser::parseGlobalContext(const std::string &line) {
 	std::string lineCopy(line);
 	lineCopy.erase(std::remove_if(lineCopy.begin(), lineCopy.end(), utils::ft_isspace), lineCopy.end());
 	utils::tolowerString(lineCopy);
 
-	if (lineCopy == SERVER + OPEN_BRACKET and scopeStack_.empty()) {
-		scopeStack_.push(SERVER);
-		scopeStack_.push(OPEN_BRACKET);
+	if (lineCopy == SERVER + OPEN_BRACKET) {
 		servers_.push_back(ServerInfo(generateServerDefaultName()));
-		configScope_ = ConfigScopeServer;
+		context_ = ContextServer;
 	} else {
 		configError(__func__, line);
 	}
 }
 
-void ConfigParser::parseServerScope(const std::string &line) {
+void ConfigParser::parseServerContext(const std::string &line) {
 	std::string lineCopy(line);
-	lineCopy.erase(std::remove_if(lineCopy.begin(), lineCopy.end(), utils::ft_isspace), lineCopy.end());
+	//lineCopy.erase(std::remove_if(lineCopy.begin(), lineCopy.end(), utils::ft_isspace), lineCopy.end());
+	utils::trim(lineCopy);
 	utils::tolowerString(lineCopy);
 
 	if (lineCopy == CLOSE_BRACKET) {
 		if (!servers_.back().checkServerInfo()) {
 			configError(__func__, line, "lack of server parameters");
 		}
-		configScope_ = ConfigScopeGlobal;
+		context_ = ContextGlobal;
 		std::cout << "Server Parsed" << std::endl;
 		std::cout << servers_.back() << std::endl;
 		return;
 	}
-
-	std::vector<std::string> splitLine = utils::split(lineCopy, SEMICOLON);
+	std::vector<std::string> splitLine = utils::split(lineCopy, WHITESPACE);
 	if (splitLine.size() != 2 || servers_.empty()) {
 		configError(__func__ , line);
 	}
@@ -148,5 +145,6 @@ std::string ConfigParser::generateServerDefaultName() {
 	std::stringstream ss;
 	ss << servers_.size() + 1;
 	std::string serverNum(ss.str());
+	std::cout << "generating default name" << std::endl;
 	return DEFAULT_SERVER_NAME + serverNum;
 }

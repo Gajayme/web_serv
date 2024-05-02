@@ -1,6 +1,14 @@
 #include "ServerInfo.h"
 #include "iostream"
 
+namespace {
+
+std::string defaultIp = "0.0.0.0";
+std::string defaultPort = "8080";
+
+} // namespace
+
+
 /**
  * @brief Print server info error.
  * @param error error description.
@@ -37,13 +45,13 @@ ServerInfo &ServerInfo::operator=(const ServerInfo &other) {
 }
 
 void ServerInfo::setIp(std::string ip) {
-	if (ip_.hasValue())
+	if (ip_.hasValue() && ip_.value() != defaultIp)
 		configError("ip already set");
 	ip_ = ip;
 }
 
 void ServerInfo::setPort(std::string port) {
-	if (port_.hasValue())
+	if (port_.hasValue() && port_.value() != defaultPort)
 		configError("port already set");
 	port_ = port;
 }
