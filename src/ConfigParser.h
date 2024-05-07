@@ -15,11 +15,10 @@ namespace {
 	std::string LISTEN("listen");
 	std::string HOST("host");
 	std::string BODY_SIZE("client_max_body_size");
+	std::string LOCATION("location");
 	std::string	OPEN_BRACKET("{");
 	std::string	CLOSE_BRACKET("}");
 	std::string	WHITESPACE(" ");
-	// TODO надо сделать так, чтобы ключи и значения в конфиге отделялись пробелами, а не двоеточиями
-	std::string	SEMICOLON(":");
 	std::string ZERO("0");
 	std::string HASHTAG("#");
 }
@@ -44,6 +43,8 @@ public:
 	void parseConfig(const std::string &path = DEFAULT_CONFIG_PATH);
 
 private:
+
+	typedef std::vector<std::string> SplitLine;
 
 	enum Context {
 		ContextGlobal, // Outside server section
@@ -87,6 +88,47 @@ private:
 	 */
 	std::string generateServerDefaultName();
 
+	/**
+	 * @brief Parse line that starts with CLOSE_BRACKET token.
+	 * @param splitLine split line that started with CLOSE_BRACKETS token.
+	 * @param origLine unformat line in case of an error.
+	 */
+	void parseCloseBracketLine(const SplitLine &splitLine, const std::string &origLine);
+
+	/**
+	 * @brief Parse line that starts with SERVER_NAME token.
+	 * @param splitLine split line that started with SERVER_NAME token.
+	 * @param origLine unformat line in case of an error.
+	 */
+	void parseServerNameLine(const SplitLine &splitLine, const std::string &origLine);
+
+	/**
+	 * @brief Parse line that starts with LISTEN token.
+	 * @param splitLine split line that started with LISTEN token.
+	 * @param origLine unformat line in case of an error.
+	 */
+	void parseListenLine(const SplitLine &splitLine, const std::string &origLine);
+
+	/**
+	 * @brief Parse line that starts with HOST token.
+	 * @param splitLine split line that started with HOST token.
+	 * @param origLine unformat line in case of an error.
+	 */
+	void parseHostLine(const SplitLine &splitLine, const std::string &origLine);
+
+	/**
+	 * @brief Parse line that starts with BODY_SIZE token.
+	 * @param splitLine split line that started with BODY_SIZE token.
+	 * @param origLine unformat line in case of an error.
+	 */
+	void parseBodySizeLine(const SplitLine &splitLine, const std::string &origLine);
+
+	/**
+	 * @brief Parse line that starts with LOCATION token.
+	 * @param splitLine split line that started with LOCATION token.
+	 * @param origLine unformat line in case of an error.
+	 */
+	void parseLocationLine(const SplitLine &splitLine, const std::string &origLine);
 
 	Context context_; //!< Current parse context.
 	std::vector<ServerInfo> servers_; //!< Containers with servers.

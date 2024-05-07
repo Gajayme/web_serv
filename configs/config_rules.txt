@@ -12,10 +12,16 @@ Style:
 2. Server content should be declared within brackets "{ }"
 3. Open bracket should be on seme line with new context declaration. For example: "server {"
 4. Close bracket "}" should be typed on new line
-5. It's forbidden to declare server inside other server
+5. Nesting servers or location is forbidden.
 6. Keys (server_name, listen, host, client_max_body_size) and their values should be separated by whitespace.
+Locations also should be separated by whitespaces: "location /www {".
 7. No additional signs allowed (except those that are parts of values)
 8. Comment starts with "#" symbol. All text after will be interpreted as comment.
+9. Regexp in locations if forbidden
+
+Values:
+
+1. Client Max Body Size should be more than 0.
 
 Values format:
 

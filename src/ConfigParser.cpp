@@ -42,8 +42,6 @@ void removeComment(std::string &s) {
 	}
 }
 
-
-
 } // namespace
 
 ConfigParser::ConfigParser():
@@ -82,6 +80,8 @@ void ConfigParser::parseLine(std::string &line) {
 		parseServerContext(line);
 	} else if (context_ == ContextLocation) {
 		// TODO implement
+		std::cout << "server parsed:" << std::endl;
+		std::cout << servers_.back() << std::endl;
 		exit (1);
 	}
 }
@@ -93,7 +93,7 @@ void ConfigParser::parseGlobalContext(const std::string &line) {
 	utils::tolowerString(lineCopy);
 
 	if (lineCopy == SERVER + OPEN_BRACKET) {
-		servers_.push_back(ServerInfo(generateServerDefaultName()));
+		servers_.push_back(ServerInfo());
 		context_ = ContextServer;
 	} else {
 		configError(__func__, line);
@@ -102,40 +102,23 @@ void ConfigParser::parseGlobalContext(const std::string &line) {
 
 void ConfigParser::parseServerContext(const std::string &line) {
 	std::string lineCopy(line);
-	//lineCopy.erase(std::remove_if(lineCopy.begin(), lineCopy.end(), utils::ft_isspace), lineCopy.end());
 	utils::trim(lineCopy);
 	utils::tolowerString(lineCopy);
 
-	if (lineCopy == CLOSE_BRACKET) {
-		if (!servers_.back().checkServerInfo()) {
-			configError(__func__, line, "lack of server parameters");
-		}
-		context_ = ContextGlobal;
-		std::cout << "Server Parsed" << std::endl;
-		std::cout << servers_.back() << std::endl;
-		return;
-	}
 	std::vector<std::string> splitLine = utils::split(lineCopy, WHITESPACE);
-	if (splitLine.size() != 2 || servers_.empty()) {
-		configError(__func__ , line);
-	}
 
-	ServerInfo &server = servers_.back();
-	if (splitLine.front() == SERVER_NAME) {
-		server.setName(splitLine.back());
+	if (splitLine.front() == CLOSE_BRACKET) {
+		parseCloseBracketLine(splitLine, line);
+	} else if (splitLine.front() == SERVER_NAME) {
+		parseServerNameLine(splitLine, line);
 	} else if (splitLine.front() == LISTEN) {
-		server.setPort(splitLine.back());
+		parseListenLine(splitLine, line);
 	} else if (splitLine.front() == HOST) {
-		if (!validateIpAddress(splitLine.back())) {
-			configError(__func__, line, "wrong ip address");
-		}
-		server.setIp(splitLine.back());
+		parseHostLine(splitLine, line);
 	} else if (splitLine.front() == BODY_SIZE) {
-		std::string maxBodySizeStr = splitLine.back();
-		if (!utils::isStringDigit(maxBodySizeStr) or maxBodySizeStr == ZERO) {
-			configError(__func__, line, "wrong max body size");
-		}
-		server.setMaxBodySize(stoi(splitLine.back()));
+		parseBodySizeLine(splitLine, line);
+	} else if (splitLine.front() == LOCATION) {
+		parseLocationLine(splitLine, line);
 	} else {
 		configError(__func__, line);
 	}
@@ -143,8 +126,62 @@ void ConfigParser::parseServerContext(const std::string &line) {
 
 std::string ConfigParser::generateServerDefaultName() {
 	std::stringstream ss;
-	ss << servers_.size() + 1;
+	ss << servers_.size();
 	std::string serverNum(ss.str());
-	std::cout << "generating default name" << std::endl;
 	return DEFAULT_SERVER_NAME + serverNum;
+}
+
+void ConfigParser::parseCloseBracketLine(const ConfigParser::SplitLine &splitLine, const std::string &origLine) {
+	if (splitLine.size() != 1) {
+		configError(__func__, origLine, "close bracket should stand alone");
+	}
+	if (!servers_.back().hasName())
+		servers_.back().setName(generateServerDefaultName());
+	context_ = ContextGlobal;
+}
+
+void ConfigParser::parseServerNameLine(const ConfigParser::SplitLine &splitLine, const std::string &origLine) {
+	if (splitLine.size() != 2) {
+		configError(__func__, origLine, "missed server name value");
+	}
+	servers_.back().setName(splitLine.back());
+}
+
+void ConfigParser::parseListenLine(const ConfigParser::SplitLine &splitLine, const std::string &origLine) {
+	const std::string &listenStr = splitLine.back();
+	if (splitLine.size() != 2) {
+		configError(__func__, origLine, "missed listen value");
+	} else if (!utils::isStringDigit(listenStr)) {
+		configError(__func__, origLine, "listen value should contain only digits");
+	}
+	servers_.back().setPort(splitLine.back());
+}
+
+void ConfigParser::parseHostLine(const ConfigParser::SplitLine &splitLine, const std::string &origLine) {
+	if (splitLine.size() != 2) {
+		configError(__func__, origLine, "missed host value");
+	} else if (!validateIpAddress(splitLine.back())) {
+		configError(__func__, origLine, "invalid ip address");
+	}
+	servers_.back().setIp(splitLine.back());
+}
+
+void ConfigParser::parseBodySizeLine(const ConfigParser::SplitLine &splitLine, const std::string &origLine) {
+	const std::string &maxBodySizeStr = splitLine.back();
+	if (splitLine.size() != 2) {
+		configError(__func__, origLine, "missed client max body size value");
+	} else if (!utils::isStringDigit(maxBodySizeStr)) {
+		configError(__func__, origLine, "client_max_body_size value should contain only digits");
+	}else if (maxBodySizeStr == ZERO) {
+		configError(__func__, origLine, "client_max_body_size value should be more than 0");
+	}
+	servers_.back().setMaxBodySize(stoi(splitLine.back()));
+}
+
+void ConfigParser::parseLocationLine(const ConfigParser::SplitLine &splitLine, const std::string &origLine) {
+	if (splitLine.size() != 3 || splitLine.back() != OPEN_BRACKET) {
+		configError(__func__, origLine, "invalid location line");
+	}
+	servers_.back().addLocation(splitLine[1]);
+	context_ = ContextLocation;
 }
