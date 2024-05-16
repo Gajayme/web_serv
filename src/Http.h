@@ -20,20 +20,18 @@ enum HttpVersion
 
 class HttpRequest
 {
-    HttpMethod _method;
-    HttpVersion _ver;
-    std::string _target; // URI
-    std::multimap<std::string, std::string> _headers;
+    public:
 
-    HttpRequest(HttpMethod method, std::string& target) : 
-        _method(method),
-        _target(target),
-        _ver(HTTP_1_1)
+    HttpMethod method;
+    HttpVersion ver;
+    std::string target; // URI
+    std::map<std::string, std::string> headers;
+
+    HttpRequest() : 
+        method(UNSUPPORTED),
+        ver(HTTP_1_1)
     {};
 
     // HttpRequest(const HttpRequest&) = default;
 
-    public:
-
-    static HttpRequest create(const char* raw);
 };

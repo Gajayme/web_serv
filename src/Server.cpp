@@ -11,7 +11,7 @@
 #include "Server.h"
 #include "ServConst.h"
 #include "Utils.h"
-#include "Http.h"
+#include "HttpParser.h"
 
 
 Server::Server():
@@ -110,7 +110,7 @@ void Server::handleIncomingRequest(const size_t idx) {
 		delFromPfds(idx);
 	} else {
 
-//		(void)HttpRequest::create(buf.data());  // idk why but buf[nbytes] == '\0'
+		(void)HttpParser().read(buf.data());  // idk why but buf[nbytes] == '\0'
 
 	}
 }

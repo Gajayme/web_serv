@@ -10,7 +10,7 @@ int main() {
 	ConfigParser configParser;
 	configParser.parseConfig(defaultConfig);
 
-//	Server serv;
-//	serv.runServer();
+	//Server serv;
+	//serv.runServer();
 	return 0;
 }
