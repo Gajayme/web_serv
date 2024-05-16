@@ -21,9 +21,13 @@ namespace utils {
 
 	void tolowerString(std::string &s);
 
+	void ltrim(std::string &s);
+	void rtrim(std::string &s);
 	void trim(std::string &s);
 
-	std::vector<std::string> split(const std::string &s, const std::string &delimiter);
+	std::vector<std::string> split(const std::string &s, const std::string& delimiter, size_t limit = 0);
+
+	std::vector<std::string> splitAndTrim(const std::string &s, std::string delimiter, size_t limit = 0);
 
 	bool isStringDigit(const std::string &s);
 
