@@ -110,7 +110,16 @@ void Server::handleIncomingRequest(const size_t idx) {
 		delFromPfds(idx);
 	} else {
 
-		(void)HttpParser().read(buf.data());  // idk why but buf[nbytes] == '\0'
+		try
+		{
+			(void)HttpParser().read(buf.data());  // idk why but buf[nbytes] == '\0'
+		}
+		catch (const bad_request& e)
+		{
+			// todo
+			// the server SHOULD respond with a 400 (Bad Request) response and close the connection.
+			std::cout << e.what() << std::endl;
+		}
 
 	}
 }

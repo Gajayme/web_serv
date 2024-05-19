@@ -5,39 +5,25 @@
 #include <stdexcept>
 
 #include "HttpParser.h"
+#include "Utils.h"
 
 
-namespace 
+std::pair<std::string, std::string> HttpParser::parseHeader(const std::string& line)
 {
-    HttpMethod parseMethod(const std::string& str)
-    {
-        if (str == "GET")
-            return GET;
-        else if (str == "PUT")
-            return PUT;
-        else if (str == "DELETE")
-            return DELETE;
-        else {
-            return UNSUPPORTED;
-        }
-    };
+    // RFC 9112: field-line = field-name ":" OWS field-value OWS
 
-    std::pair<std::string, std::string> parseHeader(const std::string& line)
-    {
-        // RFC 9112: field-line = field-name ":" OWS field-value OWS
+    std::vector<std::string> split = utils::splitAndTrim(line, ":", 1); // todo const
+    
+    if (split.size() != 2 ) throw bad_request("parseHeader size != 2");
 
-        std::vector<std::string> split = utils::splitAndTrim(line, ":", 1); // todo const
-        
-        if (split.size() != 2 ) throw std::runtime_error("parseHeader size != 2");
+    std::string& header = split[0];
+    std::string& value = split[1];
 
-        std::string& header = split[0];
-        std::string& value = split[1];
+    std::cout << "parseHeader " << header << " -- " << value << "\n";
 
-        std::cout << "parseHeader " << header << " -- " << value << "\n";
-
-        return { header, value };
-    };
+    return std::pair<std::string, std::string>(header, value);
 };
+
 
 bool HttpParser::readline(std::istringstream& data_stream)
 {
@@ -65,16 +51,16 @@ bool HttpParser::read_request_line(std::istringstream& data_stream)
 
     std::vector<std::string> split = utils::split(line_buffer, " ", 2); // todo const
 
-    if (split.size() != 3) throw std::runtime_error("read_request_line size != 3");
+    if (split.size() != 3) throw bad_request("read_request_line size != 3");
 
     std::cout << "method " << split[0] << "\n";
     std::cout << "request-target " << split[1] << "\n";
     std::cout << "HTTP-version " << split[2] << "\n";
 
-    req = HttpRequest();
-    req.method = parseMethod(split[0]);
+    req = ParsedHttpRequest();
+    req.method = split[0];
     req.target = split[1];
-    if (split[2] != "HTTP/1.1\r") throw std::runtime_error("unsupported ver"); // ????
+    req.ver = split[2];
 
     line_buffer.clear();
     state = HEADERS;
@@ -127,7 +113,7 @@ void HttpParser::read(const char* data)
             break;
         
         default:
-            throw std::runtime_error("pizdec");
+            throw std::logic_error("pizdec");
         }
     }
 }

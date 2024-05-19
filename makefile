@@ -12,7 +12,7 @@ OBJS = $(patsubst $(SRCS_DIR)/%.cpp, $(OBJS_DIR)/%.o, $(SRCS))
 
 CXX = g++
 
-CXXFLAGS = -Wall -Wextra -Werror -std=c++11 -g3
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -g3
 
 $(OBJS_DIR)/%.o: $(SRCS_DIR)/%.cpp $(HEADERS)
 	$(CXX) $(CXXFLAGS) -c $< -o $@

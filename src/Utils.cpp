@@ -14,25 +14,20 @@ void tolowerString(std::string &s) {
 	}
 }
 
+static struct c98etokaif
+{
+	bool operator()(unsigned char ch) {return !std::isspace(ch);}
+} lambda;
+
 // trim from start (in place)
 void ltrim(std::string &s) 
 {
-	struct c98etokaif
-	{
-		bool operator()(unsigned char ch) {return !std::isspace(ch);}
-	} lambda;
-
     s.erase(s.begin(), std::find_if(s.begin(), s.end(), lambda));
 }
 
 // trim from end (in place)
 void rtrim(std::string &s) 
 {
-	struct c98etokaif
-	{
-		bool operator()(unsigned char ch) {return !std::isspace(ch);}
-	} lambda;
-
     s.erase(std::find_if(s.rbegin(), s.rend(), lambda).base(), s.end());
 }
 

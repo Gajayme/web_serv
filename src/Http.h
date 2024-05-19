@@ -35,3 +35,16 @@ class HttpRequest
     // HttpRequest(const HttpRequest&) = default;
 
 };
+
+// HttpMethod parseMethod(const std::string& str)
+// {
+//     if (str == "GET")
+//         return GET;
+//     else if (str == "PUT")
+//         return PUT;
+//     else if (str == "DELETE")
+//         return DELETE;
+//     else {
+//         return UNSUPPORTED;
+//     }
+// };
