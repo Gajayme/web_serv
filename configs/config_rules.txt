@@ -22,6 +22,8 @@ Locations also should be separated by whitespaces: "location /www {".
 Values:
 
 1. Client Max Body Size should be more than 0.
+2. Autoindex should be on/off
+3. Allow methods could be: GET, POST, DELETE
 
 Values format:
 

@@ -13,7 +13,7 @@ std::string defaultPort = "8080";
  * @brief Print server info error.
  * @param error error description.
  */
-void configError(const std::string error = "") {
+void configError(const std::string &error = "") {
 	std::cout << "ServerInfo: " << error << std::endl;
 }
 
@@ -45,19 +45,19 @@ ServerInfo &ServerInfo::operator=(const ServerInfo &other) {
 	return  *this;
 }
 
-void ServerInfo::setIp(std::string ip) {
+void ServerInfo::setIp(const std::string &ip) {
 	if (ip_.hasValue() && ip_.value() != defaultIp)
 		configError("ip already set");
 	ip_ = ip;
 }
 
-void ServerInfo::setPort(std::string port) {
+void ServerInfo::setPort(const std::string &port) {
 	if (port_.hasValue() && port_.value() != defaultPort)
 		configError("port already set");
 	port_ = port;
 }
 
-void ServerInfo::setName(std::string name) {
+void ServerInfo::setName(const std::string &name) {
 	if (name_.hasValue())
 		configError("name already set");
 	name_ = name;
@@ -79,6 +79,13 @@ bool ServerInfo::hasName() {
 
 void ServerInfo::addLocation(const std::string &url) {
 	locations_.push_back(LocationInfo(url));
+}
+
+LocationInfo *ServerInfo::getLastLocation() {
+	if (locations_.empty()) {
+		return nullptr;
+	}
+	return locations_.data() + locations_.size() - 1;
 }
 
 std::ostream& operator<< (std::ostream &out, const ServerInfo &serverInfo) {

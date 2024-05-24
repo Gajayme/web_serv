@@ -3,25 +3,7 @@
 #include <string>
 #include <vector>
 #include "ServerInfo.h"
-#include <stack>
-
 #include "ServConst.h"
-
-namespace {
-	std::string DEFAULT_CONFIG_PATH("/Users/georgii/School_21/web_serv/configs/default.conf");
-	std::string DEFAULT_SERVER_NAME("default_");
-	std::string SERVER("server");
-	std::string SERVER_NAME("server_name");
-	std::string LISTEN("listen");
-	std::string HOST("host");
-	std::string BODY_SIZE("client_max_body_size");
-	std::string LOCATION("location");
-	std::string	OPEN_BRACKET("{");
-	std::string	CLOSE_BRACKET("}");
-	std::string	WHITESPACE(" ");
-	std::string ZERO("0");
-	std::string HASHTAG("#");
-}
 
 class ConfigParser {
 
@@ -40,7 +22,7 @@ public:
 	 * @brief Parse config.
 	 * @param path Path to config file
 	 */
-	void parseConfig(const std::string &path = DEFAULT_CONFIG_PATH);
+	void parseConfig(const std::string &path = configTokens::DEFAULT_CONFIG_PATH);
 
 private:
 
@@ -81,6 +63,12 @@ private:
 	 * @param line Line to parse.
 	 */
 	void parseServerContext(const std::string &line);
+
+	/**
+	 * @brief Parse location context line.
+	 * @param line Line to parse.
+	 */
+	void parseLocationContext(const std::string &line);
 
 	/**
 	 * @brief Generate default name for server.
@@ -129,6 +117,21 @@ private:
 	 * @param origLine unformat line in case of an error.
 	 */
 	void parseLocationLine(const SplitLine &splitLine, const std::string &origLine);
+
+	/**
+	 * @brief Parse line that starts with AUTONDEX token.
+	 * @param splitLine split line that started with AUTONDEX token.
+	 * @param origLine unformat line in case of an error.
+	 */
+	void parseAutoindexLine(const SplitLine &splitLine, const std::string &origLine);
+
+	/**
+	 * @brief Parse line that starts with METHODS token.
+	 * @param splitLine split line that started with METHODS token.
+	 * @param origLine unformat line in case of an error.
+	 */
+	void parseMethodsLine(const SplitLine &splitLine, const std::string &origLine);
+
 
 	Context context_; //!< Current parse context.
 	std::vector<ServerInfo> servers_; //!< Containers with servers.

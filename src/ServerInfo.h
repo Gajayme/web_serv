@@ -16,19 +16,19 @@ public:
 	 * @brief Set server ip.
 	 * @param ip ip.
 	 */
-	void setIp(std::string ip);
+	void setIp(const std::string &ip);
 
 	/**
 	 * @brief Set server port.
 	 * @param port port.
 	 */
-	void setPort(std::string port);
+	void setPort(const std::string &port);
 
 	/**
 	 * @brief Set server name.
 	 * @param name name.
 	 */
-	void setName(std::string name);
+	void setName(const std::string &name);
 
 	/**
 	 * @brief Set maximum body size of client's request.
@@ -55,7 +55,13 @@ public:
 	void addLocation(const std::string &url);
 
 	/**
-	 * @brief Overloading of c out operator.
+	 * @brief Return last added location.
+	 * @return Last added location if exists, else nullptr
+	 */
+	LocationInfo *getLastLocation();
+
+	/**
+	 * @brief Overloading of cout operator.
 	 * @param out standard output stream.
 	 * @param serverInfo Server info object.
 	 * @return standard output stream.
