@@ -11,7 +11,6 @@
 #include "Server.h"
 #include "ServConst.h"
 #include "Utils.h"
-#include "HttpParser.h"
 
 
 Server::Server():
@@ -97,7 +96,8 @@ void Server::acceptNewConnection() {
 
 void Server::handleIncomingRequest(const size_t idx) {
 	std::array<char, constants::buffSize> buf; //!< Buffer for client data
-	ssize_t nbytes = recv(pfds_[idx].fd, buf.data(), buf.size(), 0);
+	int fd = pfds_[idx].fd;
+	ssize_t nbytes = recv(fd, buf.data(), buf.size() - 1, 0);
 	if (nbytes <= 0) {
 		//! Got error or connection closed by client
 		if (nbytes == 0) {
@@ -109,18 +109,8 @@ void Server::handleIncomingRequest(const size_t idx) {
 		close(pfds_[idx].fd); //! Bye!
 		delFromPfds(idx);
 	} else {
-
-		try
-		{
-			(void)HttpParser().read(buf.data());  // idk why but buf[nbytes] == '\0'
-		}
-		catch (const bad_request& e)
-		{
-			// todo
-			// the server SHOULD respond with a 400 (Bad Request) response and close the connection.
-			std::cout << e.what() << std::endl;
-		}
-
+		buf[nbytes] = '\0';
+		clients_[fd].receive(buf.data());
 	}
 }
 

@@ -28,7 +28,7 @@ namespace configTokens {
 namespace constants {
 
 	const int listeningBacklog = 10;
-	const int buffSize = 512;
+	const int buffSize = 256;
 
 	enum HttpMethod {
 		HttpMethodGet,

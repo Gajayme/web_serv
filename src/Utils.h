@@ -30,6 +30,7 @@ namespace utils {
 	std::vector<std::string> splitAndTrim(const std::string &s, std::string delimiter, size_t limit = 0);
 
 	bool isStringDigit(const std::string &s);
+	bool isStringHexDigit(const std::string &s);
 
 	bool ft_isspace(char c);
 

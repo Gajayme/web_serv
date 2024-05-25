@@ -8,14 +8,16 @@
 #include <stdexcept>
 
 
+typedef std::map<std::string, std::string> headers_map;
+
 struct ParsedHttpRequest
 {
     std::string method;
     std::string ver;
     std::string target; // URI
-    std::map<std::string, std::string> headers;
+    headers_map headers;
+    std::string body;
 };
-
 
 struct bad_request : public std::runtime_error 
 {
@@ -27,8 +29,10 @@ class HttpParser
     enum {
         REQUEST_LINE,
         HEADERS,
-        CONTENT_LENGTH,
-        CHUNKED,
+        PLAIN_BODY,
+        CHUNKED_SIZE,
+        CHUNKED_DATA,
+        TRAILERS,
     } state;
 
     ParsedHttpRequest req;
@@ -37,13 +41,23 @@ class HttpParser
     std::string body_buffer;
     size_t bytes_left;
 
-    bool readline(std::istringstream& data_stream);
+    bool readline_to_buffer(std::istringstream& data_stream);
     bool read_request_line(std::istringstream& data_stream);
     bool read_headers(std::istringstream& data_stream);
+    bool read_bytes_left(std::istringstream& data_stream);
+    bool read_chunked_data(std::istringstream& data_stream);
+    bool read_chunked_size(std::istringstream& data_stream);
+    bool read_trailers(std::istringstream& data_stream);
     bool read_plain_body(std::istringstream& data_stream);
-    bool read_chunked_body(std::istringstream& data_stream);
 
-    static std::pair<std::string, std::string> parseHeader(const std::string& line);
+    void complete_req();
+    void strip_chunked();
+   
+    static std::pair<std::string, std::string> parse_header(const std::string& line);
+    static bool parse_Transfer_Encoding_Chunked(const std::string& line);
+
+    template<int BASE>
+    static size_t parse_size_field(const std::string& line); // = delete;
 
     public:
 

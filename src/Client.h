@@ -2,6 +2,7 @@
 
 #include <string>
 #include <poll.h>
+#include "HttpParser.h"
 
 class Client {
 public:
@@ -18,22 +19,14 @@ public:
 	//! Assignment operator
 	Client &operator=(const Client &other);
 
-	//! Add portion of client request data
-	void addRequestData(const char *data);
-
-	//! Parse request chunk and decide whether it's fully received
-	bool parseRequestChunk(const char *data);
+	void receive(const char* request_data);
 
 private:
 
 	//! Current event (READ/WRITE)
 	short event_;
 
-	//! whether request received fully
-	bool isRequestReceived_;
-
-	//! buffer for request data
-	std::string requestData_;
+	HttpParser parser;
 
 };
 

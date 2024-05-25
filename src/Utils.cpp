@@ -85,6 +85,14 @@ bool isStringDigit(const std::string &s) {
 	return true;
 }
 
+bool isStringHexDigit(const std::string &s) {
+	for(size_t i = 0; i < s.size(); ++i)
+		if(!isxdigit(s[i])) {
+			return false;
+		}
+	return true;
+}
+
 bool ft_isspace(char x) {
 	return std::isspace(x);
 }
