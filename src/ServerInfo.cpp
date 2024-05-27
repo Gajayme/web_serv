@@ -31,17 +31,18 @@ ServerInfo::ServerInfo(const ServerInfo &other):
 ip_(other.ip_),
 port_(other.port_),
 name_(other.name_),
-clientMaxBodySize_(other.clientMaxBodySize_) {
+clientMaxBodySize_(other.clientMaxBodySize_),
+locations_(other.locations_) {
 };
 
 ServerInfo &ServerInfo::operator=(const ServerInfo &other) {
-	if (this == &other) {
-		return *this;
+	if (this != &other) {
+		ip_ = other.ip_;
+		port_ = other.port_;
+		name_ = other.name_;
+		clientMaxBodySize_ = other.clientMaxBodySize_;
+		locations_ = other.locations_;
 	}
-	ip_ = other.ip_;
-	port_ = other.port_;
-	name_ = other.name_;
-	clientMaxBodySize_ = other.clientMaxBodySize_;
 	return  *this;
 }
 
@@ -81,17 +82,18 @@ void ServerInfo::addLocation(const std::string &url) {
 	locations_.push_back(LocationInfo(url));
 }
 
-LocationInfo *ServerInfo::getLastLocation() {
-	if (locations_.empty()) {
-		return nullptr;
-	}
-	return locations_.data() + locations_.size() - 1;
+ServerInfo::Locations &ServerInfo::getLocations() {
+	return locations_;
 }
 
 std::ostream& operator<< (std::ostream &out, const ServerInfo &serverInfo) {
 	out << "Server " << serverInfo.name_.valueOr("NoName") << " info:" << std::endl << //
 	"ip: " << serverInfo.ip_.valueOr("undefined") << std::endl << //
 	"port: " << serverInfo.port_.valueOr("undefined") << std::endl <<
-	"client max body size: " << serverInfo.clientMaxBodySize_.valueOr(0) << std::endl;
+	"client max body size: " << serverInfo.clientMaxBodySize_.valueOr(0) << std::endl << std::endl;
+
+	for (size_t i = 0; i < serverInfo.locations_.size(); ++i) {
+		out << serverInfo.locations_[i] << std::endl;
+	}
 	return out;
 }

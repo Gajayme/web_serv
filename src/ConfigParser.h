@@ -55,20 +55,23 @@ private:
 	/**
 	 * @brief Parse global context line.
 	 * @param line Line to parse.
+	 * @param lineCopy Line to parse copy.
 	 */
-	void parseGlobalContext(const std::string &line);
+	void parseGlobalContext(const std::string &line, std::string &lineCopy);
 
 	/**
 	 * @brief Parse server context line.
 	 * @param line Line to parse.
+	 * @param lineCopy Line to parse copy.
 	 */
-	void parseServerContext(const std::string &line);
+	void parseServerContext(const std::string &line, std::string &lineCopy);
 
 	/**
 	 * @brief Parse location context line.
 	 * @param line Line to parse.
+	 * @param lineCopy Line to parse copy.
 	 */
-	void parseLocationContext(const std::string &line);
+	void parseLocationContext(const std::string &line, std::string &lineCopy);
 
 	/**
 	 * @brief Generate default name for server.
@@ -122,16 +125,34 @@ private:
 	 * @brief Parse line that starts with AUTONDEX token.
 	 * @param splitLine split line that started with AUTONDEX token.
 	 * @param origLine unformat line in case of an error.
+	 * @param location location to set AUTONDEX for.
 	 */
-	void parseAutoindexLine(const SplitLine &splitLine, const std::string &origLine);
+	void parseAutoindexLine(const SplitLine &splitLine, const std::string &origLine, LocationInfo &location);
 
 	/**
 	 * @brief Parse line that starts with METHODS token.
 	 * @param splitLine split line that started with METHODS token.
 	 * @param origLine unformat line in case of an error.
+	 * @param location location to set METHODS for.
 	 */
-	void parseMethodsLine(const SplitLine &splitLine, const std::string &origLine);
+	void parseMethodsLine(const SplitLine &splitLine, const std::string &origLine, LocationInfo &location);
 
+	/**
+	 * @brief Parse line that starts with ROOT token.
+	 * @param splitLine split line that started with ROOT token.
+	 * @param origLine unformat line in case of an error.
+	 * @param location location to set ROOT for.
+	 */
+	void parseRootLine(const SplitLine &splitLine, const std::string &origLine, LocationInfo &location);
+
+
+	/**
+	 * @brief Parse line that starts with INDEX token.
+	 * @param splitLine split line that started with INDEX token.
+	 * @param origLine unformat line in case of an error.
+	 * @param location location to set INDEX for.
+	 */
+	void parseIndexLine(const SplitLine &splitLine, const std::string &origLine, LocationInfo &location);
 
 	Context context_; //!< Current parse context.
 	std::vector<ServerInfo> servers_; //!< Containers with servers.

@@ -1,4 +1,5 @@
 #include "ConfigParser.h"
+#include "LocationInfo.h"
 
 #include <iostream>
 #include <algorithm>
@@ -66,6 +67,10 @@ void ConfigParser::parseConfig(const std::string &path) {
 		parseLine(line);
 	}
 	config.close();
+
+//	for (size_t i = 0; i < servers_.size(); ++i) {
+//		std::cout << servers_[i] << std::endl;
+//	}
 }
 
 void ConfigParser::parseLine(std::string &line) {
@@ -74,20 +79,23 @@ void ConfigParser::parseLine(std::string &line) {
 	if (line.empty()) {
 		return;
 	}
+
+	std::string lineCopy(line);
+	utils::trim(lineCopy);
+	utils::tolowerString(lineCopy);
+
 	if (context_ == ContextGlobal) {
-		parseGlobalContext(line);
+		parseGlobalContext(line, lineCopy);
 	} else if (context_ == ContextServer) {
-		parseServerContext(line);
+		parseServerContext(line, lineCopy);
 	} else if (context_ == ContextLocation) {
-		parseLocationContext(line);
+		parseLocationContext(line, lineCopy);
 	}
 }
 
 
-void ConfigParser::parseGlobalContext(const std::string &line) {
-	std::string lineCopy(line);
+void ConfigParser::parseGlobalContext(const std::string &line, std::string &lineCopy) {
 	lineCopy.erase(std::remove_if(lineCopy.begin(), lineCopy.end(), utils::ft_isspace), lineCopy.end());
-	utils::tolowerString(lineCopy);
 
 	if (lineCopy == configTokens::SERVER + configTokens::OPEN_BRACKET) {
 		servers_.push_back(ServerInfo());
@@ -97,13 +105,9 @@ void ConfigParser::parseGlobalContext(const std::string &line) {
 	}
 }
 
-void ConfigParser::parseServerContext(const std::string &line) {
-	// TODO как будто можно вынести в отдельное место
-	std::string lineCopy(line);
-	utils::trim(lineCopy);
-	utils::tolowerString(lineCopy);
-
+void ConfigParser::parseServerContext(const std::string &line, std::string &lineCopy) {
 	std::vector<std::string> splitLine = utils::split(lineCopy, configTokens::WHITESPACE);
+
 	// TODO стоит подумать над диспетчеризацией методов
 	if (splitLine.front() == configTokens::CLOSE_BRACKET) {
 		parseCloseBracketLine(splitLine, line);
@@ -122,17 +126,21 @@ void ConfigParser::parseServerContext(const std::string &line) {
 	}
 }
 
-void ConfigParser::parseLocationContext(const std::string &line) {
-	// TODO как будто можно вынести в отдельное место (в совокупности с диспетчеризацией может получиться неплохо)
-	std::string lineCopy(line);
-	utils::trim(lineCopy);
-	utils::tolowerString(lineCopy);
-
+void ConfigParser::parseLocationContext(const std::string &line, std::string &lineCopy) {
 	std::vector<std::string> splitLine = utils::split(lineCopy, configTokens::WHITESPACE);
-	if (splitLine.front() == configTokens::AUTONDEX) {
-		parseAutoindexLine(splitLine, line);
+
+	ServerInfo &lastServer = servers_.back();
+	ServerInfo::Locations &locations = lastServer.getLocations();
+	if (locations.empty()) {
+		configError(__func__, line, "no location to parse location data for");
+	} else if (splitLine.front() == configTokens::AUTONDEX) {
+		parseAutoindexLine(splitLine, line, locations.back());
 	} else if (splitLine.front() == configTokens::METHODS) {
-		parseMethodsLine(splitLine, line);
+		parseMethodsLine(splitLine, line, locations.back());
+	} else if (splitLine.front() == configTokens::ROOT)
+		parseRootLine(splitLine, line, locations.back());
+	else if (splitLine.front() == configTokens::INDEX) {
+		parseIndexLine(splitLine, line, locations.back());
 	} else if (splitLine.front() == configTokens::CLOSE_BRACKET) {
 		parseCloseBracketLine(splitLine, line);
 	} else {
@@ -214,41 +222,46 @@ void ConfigParser::parseLocationLine(const ConfigParser::SplitLine &splitLine, c
 	context_ = ContextLocation;
 }
 
-void ConfigParser::parseAutoindexLine(const ConfigParser::SplitLine &splitLine, const std::string &origLine) {
-	ServerInfo &lastServer = servers_.back();
-	LocationInfo *location = lastServer.getLastLocation();
-
-	if (location == nullptr) {
-		configError(__func__, origLine, "no location to set autoindex for");
-	} else if (splitLine.size() != 2) {
+void ConfigParser::parseAutoindexLine(const ConfigParser::SplitLine &splitLine, const std::string &origLine, LocationInfo &location) {
+	if (splitLine.size() != 2) {
 		configError(__func__, origLine, "invalid autoindex line");
 	} else if (splitLine.back() == configTokens::ON) {
-		lastServer.getLastLocation()->setListing(true);
+		location.setListing(true);
 	} else if (splitLine.back() == configTokens::OFF) {
-		lastServer.getLastLocation()->setListing(false);
+		location.setListing(false);
 	} else {
 		configError(__func__, origLine, "autoindex value should be on/off");
 	}
 }
 
-void ConfigParser::parseMethodsLine(const ConfigParser::SplitLine &splitLine, const std::string &origLine) {
-	ServerInfo &lastServer = servers_.back();
-	LocationInfo *location = lastServer.getLastLocation();
-	if (location == nullptr) {
-		configError(__func__, origLine, "no location to set allowed method for");
-	} else if (splitLine.size() < 2) {
+void ConfigParser::parseMethodsLine(const ConfigParser::SplitLine &splitLine, const std::string &origLine, LocationInfo &location) {
+	if (splitLine.size() < 2) {
 		configError(__func__, origLine, "invalid  line");
 	}
 
-	for (SplitLine::const_iterator cit; cit != splitLine.cend(); ++cit) {
+	for (SplitLine::const_iterator cit = splitLine.cbegin() + 1; cit != splitLine.cend(); ++cit) {
 		if (*cit == configTokens::GET) {
-			location->setHttpMethodOn(constants::HttpMethodGet);
+			location.setHttpMethodOn(constants::HttpMethodGet);
 		} else if(*cit == configTokens::POST) {
-			location->setHttpMethodOn(constants::HttpMethodPost);
+			location.setHttpMethodOn(constants::HttpMethodPost);
 		} else if (*cit == configTokens::DELETE) {
-			location->setHttpMethodOn(constants::HttpMethodDelete);
+			location.setHttpMethodOn(constants::HttpMethodDelete);
 		} else {
 			configError(__func__, origLine, "unsupported Http method");
 		}
 	}
+}
+
+void ConfigParser::parseRootLine(const ConfigParser::SplitLine &splitLine, const std::string &origLine, LocationInfo &location) {
+	if (splitLine.size() != 2) {
+		configError(__func__, origLine, "invalid  line");
+	}
+	location.setRoot(splitLine.back());
+}
+
+void ConfigParser::parseIndexLine(const ConfigParser::SplitLine &splitLine, const std::string &origLine, LocationInfo &location) {
+	if (splitLine.size() < 2) {
+		configError(__func__, origLine, "invalid  line");
+	}
+	location.setIndexes(LocationInfo::Indexes(splitLine.begin() + 1, splitLine.end()));
 }

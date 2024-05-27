@@ -7,8 +7,20 @@
 
 class ServerInfo {
 public:
+
+	typedef std::vector<LocationInfo> Locations;
+
+	/**
+	 * @brief Constructor.
+	 */
 	ServerInfo();
+
+	/**
+	 * @brief Destructor.
+	 */
 	~ServerInfo();
+
+
 	ServerInfo(const ServerInfo &other);
 	ServerInfo &operator=(const ServerInfo &other);
 
@@ -55,10 +67,10 @@ public:
 	void addLocation(const std::string &url);
 
 	/**
-	 * @brief Return last added location.
-	 * @return Last added location if exists, else nullptr
+	 * @brief Get locations.
+	 * @return Container with all locations
 	 */
-	LocationInfo *getLastLocation();
+	Locations &getLocations();
 
 	/**
 	 * @brief Overloading of cout operator.
@@ -74,5 +86,5 @@ public:
 	Optional<std::string> port_; //!< server port.
 	Optional<std::string> name_; //!< custom server name.
 	Optional<size_t> clientMaxBodySize_; //!< server max body size.
-	std::vector<LocationInfo> locations_; //!< container of locations.
+	Locations locations_; //!< container of locations.
 };

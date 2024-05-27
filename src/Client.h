@@ -7,16 +7,27 @@
 class Client {
 public:
 
-	//! Constructor
+	/**
+	 * @brief Constructor. Create empty Optional.
+	 */
 	Client();
 
-	//! Destructor
+	/**
+	 * @brief Constructor. Create empty Optional.
+	 */
 	~Client();
 
-	//! Copy constructor
+	/**
+	 * @brief Copy constructor.
+	 * @param other another Client object to copy from.
+	 */
 	Client(const Client &other);
 
-	//! Assignment operator
+
+	/**
+	 * @brief Assignment operator.
+	 * @param other another Client object to assign from
+	 */
 	Client &operator=(const Client &other);
 
 	void receive(const char* request_data);

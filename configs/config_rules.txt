@@ -1,35 +1,54 @@
 Keywords:
 
-"server" - define new server, each server should contain values: server_name, listen, host, client_max_body_size.
-"server_name" - server name (if not defined "default_server_N" will be set)
-"listen" - port on which server will be listening for the new connections.
-"host" - server ip
-"client_max_body_size" - max body size of client request
+global scope
+
+1."server" - define new server, each server should contain values: server_name, listen, host, client_max_body_size.
+
+
+server scope
+
+1. "server_name" - server name (if not defined "default_server_N" will be set)
+2. "listen" - port on which server will be listening for the new connections.
+3. "host" - server ip
+4. "client_max_body_size" - max body size of client request
+
+location scope
+
+1. "root" - folder in which server will try to find requested file
+2. "index" - which file server should serve if none are specified.
+3. "allow_methods" - methods that are allowed in particular location. You could
+only set GET, DELETE, POST as allow_methods. All allowed methods should be declared at once, separated by spaces
 
 Style:
 
-1. Each server should be declared on new line.
+1. Each server should be declared on new line
 2. Server content should be declared within brackets "{ }"
 3. Open bracket should be on seme line with new context declaration. For example: "server {"
 4. Close bracket "}" should be typed on new line
-5. Nesting servers or location is forbidden.
-6. Keys (server_name, listen, host, client_max_body_size) and their values should be separated by whitespace.
-Locations also should be separated by whitespaces: "location /www {".
+5. Nesting servers or location is forbidden
+6. Keys and their values should be separated by whitespace.
+Locations also should be separated by whitespaces: "location /www {"
 7. No additional signs allowed (except those that are parts of values)
-8. Comment starts with "#" symbol. All text after will be interpreted as comment.
+8. Comment starts with "#" symbol. All text after will be interpreted as comment
 9. Regexp in locations if forbidden
+10.
+
 
 Values:
 
-1. Client Max Body Size should be more than 0.
-2. Autoindex should be on/off
+1. Client Max Body Size should be more than 0
+2. Autoindex should be string "on"/"off"
 3. Allow methods could be: GET, POST, DELETE
+4. Host value should meets ipv4/ipv6 format
 
 Values format:
 
-server_name:
-host:
-listen:
-client_max_body_size:
+server_name: string
+host: string
+listen: integer
+client_max_body_size: integer
+аutoindex: string
+allow_methods: strings
+root: strings
 
 

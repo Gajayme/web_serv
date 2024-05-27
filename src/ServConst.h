@@ -10,16 +10,18 @@ namespace configTokens {
 	const std::string BODY_SIZE("client_max_body_size");
 	const std::string LOCATION("location");
 	const std::string AUTONDEX("autoindex");
-	const std::string METHODS("allow_methods");
+	const std::string METHODS("allowed_methods");
+	const std::string ROOT("root");
+	const std::string INDEX("index");
 	const std::string GET("get");
 	const std::string POST("post");
 	const std::string DELETE("delete");
 	const std::string UNSUPPORTED("unsupported");
 	const std::string ON("on");
 	const std::string OFF("off");
-	const std::string	OPEN_BRACKET("{");
-	const std::string	CLOSE_BRACKET("}");
-	const std::string	WHITESPACE(" ");
+	const std::string OPEN_BRACKET("{");
+	const std::string CLOSE_BRACKET("}");
+	const std::string WHITESPACE(" ");
 	const std::string ZERO("0");
 	const std::string HASHTAG("#");
 } // namespace configTokens
