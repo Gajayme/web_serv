@@ -10,7 +10,8 @@ int main() {
 	ConfigParser configParser;
 	configParser.parseConfig(defaultConfig);
 
-	Server serv;
+	// TODO надо засовывать в сервер первое инфо (которое надо провалидировать)
+	Server serv(configParser.getServers().front());
 	serv.runServer();
 	return 0;
 }

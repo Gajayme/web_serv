@@ -1,5 +1,6 @@
 #include "ConfigParser.h"
 #include "LocationInfo.h"
+#include "Optional.h"
 
 #include <iostream>
 #include <algorithm>
@@ -43,6 +44,22 @@ void removeComment(std::string &s) {
 	}
 }
 
+template<typename T>
+void setServerInfoValue(Optional<T> &optional, T value, const std::string &line) {
+	if (optional.hasValue()) {
+		configError(__func__, line, "Value already set");
+	}
+	optional = value;
+}
+
+void checkServerInfo(const ServerInfo &serverInfo) {
+	// TODO нужно ли проверять заполнены ли ли локейшны
+	if (!serverInfo.ip.hasValue() || !serverInfo.port.hasValue() || !serverInfo.name.hasValue() ||
+	!serverInfo.clientMaxBodySize.hasValue()) {
+		configError(__func__, "server is not filled correctly");
+	}
+}
+
 } // namespace
 
 ConfigParser::ConfigParser():
@@ -51,6 +68,10 @@ ConfigParser::ConfigParser():
 }
 
 ConfigParser::~ConfigParser() {}
+
+const std::vector<ServerInfo> &ConfigParser::getServers() {
+	return servers_;
+}
 
 void ConfigParser::parseConfig(const std::string &path) {
 	context_ = ContextGlobal;
@@ -130,7 +151,7 @@ void ConfigParser::parseLocationContext(const std::string &line, std::string &li
 	std::vector<std::string> splitLine = utils::split(lineCopy, configTokens::WHITESPACE);
 
 	ServerInfo &lastServer = servers_.back();
-	ServerInfo::Locations &locations = lastServer.getLocations();
+	ServerInfo::Locations &locations = lastServer.locations;
 	if (locations.empty()) {
 		configError(__func__, line, "no location to parse location data for");
 	} else if (splitLine.front() == configTokens::AUTONDEX) {
@@ -162,9 +183,10 @@ void ConfigParser::parseCloseBracketLine(const ConfigParser::SplitLine &splitLin
 	switch (context_) {
 		case ContextServer:
 			context_ = ContextGlobal;
-			if (!servers_.back().hasName()) {
-				servers_.back().setName(generateServerDefaultName());
+			if (!servers_.back().name.hasValue()) {
+				servers_.back().name = generateServerDefaultName();
 			}
+			checkServerInfo(servers_.back());
 			break;
 
 		case ContextLocation:
@@ -180,7 +202,7 @@ void ConfigParser::parseServerNameLine(const ConfigParser::SplitLine &splitLine,
 	if (splitLine.size() != 2) {
 		configError(__func__, origLine, "missed server name value");
 	}
-	servers_.back().setName(splitLine.back());
+	setServerInfoValue(servers_.back().name, splitLine.back(), origLine);
 }
 
 void ConfigParser::parseListenLine(const ConfigParser::SplitLine &splitLine, const std::string &origLine) {
@@ -190,7 +212,7 @@ void ConfigParser::parseListenLine(const ConfigParser::SplitLine &splitLine, con
 	} else if (!utils::isStringDigit(listenStr)) {
 		configError(__func__, origLine, "listen value should contain only digits");
 	}
-	servers_.back().setPort(splitLine.back());
+	setServerInfoValue(servers_.back().port, splitLine.back(), origLine);
 }
 
 void ConfigParser::parseHostLine(const ConfigParser::SplitLine &splitLine, const std::string &origLine) {
@@ -199,7 +221,7 @@ void ConfigParser::parseHostLine(const ConfigParser::SplitLine &splitLine, const
 	} else if (!validateIpAddress(splitLine.back())) {
 		configError(__func__, origLine, "invalid ip address");
 	}
-	servers_.back().setIp(splitLine.back());
+	setServerInfoValue(servers_.back().ip, splitLine.back(), origLine);
 }
 
 void ConfigParser::parseBodySizeLine(const ConfigParser::SplitLine &splitLine, const std::string &origLine) {
@@ -211,14 +233,17 @@ void ConfigParser::parseBodySizeLine(const ConfigParser::SplitLine &splitLine, c
 	}else if (maxBodySizeStr == configTokens::ZERO) {
 		configError(__func__, origLine, "client_max_body_size value should be more than 0");
 	}
-	servers_.back().setMaxBodySize(stoi(splitLine.back()));
+	size_t clientMaxBodySize = static_cast<size_t>(stoi(splitLine.back()));
+	setServerInfoValue(servers_.back().clientMaxBodySize, clientMaxBodySize, origLine);
 }
 
 void ConfigParser::parseLocationLine(const ConfigParser::SplitLine &splitLine, const std::string &origLine) {
 	if (splitLine.size() != 3 || splitLine.back() != configTokens::OPEN_BRACKET) {
 		configError(__func__, origLine, "invalid location line");
 	}
-	servers_.back().addLocation(splitLine[1]);
+
+	LocationInfo locationInfo(splitLine[1]);
+	servers_.back().locations.push_back(locationInfo);
 	context_ = ContextLocation;
 }
 

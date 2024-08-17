@@ -6,16 +6,17 @@
 #include <poll.h>
 
 #include "Client.h"
+#include "ServerInfo.h"
 
-#define PORT "9034"   // Port we're listening on.
 
 class Server {
 public:
 
 	/**
 	 * @brief Constructor.
+	 * @param serverInfo info with params to build server
 	 */
-	Server();
+	explicit Server(const ServerInfo &serverInfo);
 
 	/**
 	 * @brief Destructor.
@@ -64,7 +65,10 @@ private:
 	void handleIncomingRequest(size_t idx);
 
 	//! Server IP address
-	int ip_;
+	std::string ip_;
+	//! Server PORT address
+	std::string port_;
+
 	//! Listening socket descriptor
 	int listener_;
 	//! Fds of current connections
@@ -76,9 +80,10 @@ private:
 
 /**
  * @brief Create listening socket.
+ * @param port port tot listen on.
  * @return Listening socket fd.
  */
-int getListenerSocket();
+int getListenerSocket(const char* port);
 
 /**
  * @brief Get addr of incoming connection.

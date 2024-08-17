@@ -19,8 +19,14 @@ public:
 	~ConfigParser();
 
 	/**
+  	 * @brief Get all parsed servers.
+  	 * @return all parsed servers.
+  	 */
+	const std::vector<ServerInfo> &getServers();
+
+	/**
 	 * @brief Parse config.
-	 * @param path Path to config file
+	 * @param path Path to config file.
 	 */
 	void parseConfig(const std::string &path = configTokens::DEFAULT_CONFIG_PATH);
 

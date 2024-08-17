@@ -9,16 +9,18 @@
 #include <array>
 
 #include "Server.h"
+
 #include "ServConst.h"
 #include "Utils.h"
 
 
-Server::Server():
-ip_(),
+Server::Server(const ServerInfo &serverInfo):
+ip_(*serverInfo.ip),
+port_(*serverInfo.port),
 listener_(),
 pfds_(),
 clients_() {
-	listener_ = getListenerSocket();
+	listener_ = getListenerSocket(port_.c_str());
 	if (listener_ == -1) {
 		std::cout << stderr << "error getting listening socket" << std::endl;
 		exit(1);
@@ -114,7 +116,7 @@ void Server::handleIncomingRequest(const size_t idx) {
 	}
 }
 
-int getListenerSocket() {
+int getListenerSocket(const char * const port) {
 	int listener;     //!< Listening socket descriptor
 	int yes = 1;      //!< For setsockopt() SO_REUSEADDR, below
 	int rv;
@@ -124,7 +126,7 @@ int getListenerSocket() {
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_flags = AI_PASSIVE;
-	if ((rv = getaddrinfo(nullptr, PORT, &hints, &ai)) != 0) {
+	if ((rv = getaddrinfo(nullptr, port, &hints, &ai)) != 0) {
 		std::cout << stderr << "selectserver: " << gai_strerror(rv) << std::endl;
 		exit(1);
 	}
