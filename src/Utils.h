@@ -34,11 +34,19 @@ namespace utils {
 
 	bool ft_isspace(char c);
 
+	/**
+	 * @brief Print server parsing error and exit.
+	 * @param line line in which error occurred.
+	 * @param error error description.
+	 */
+	void configError(const std::string &funkName = "", const std::string &line = "", const std::string &error = "config error");
+
+
 	template <typename T>
 	void clear_stack(std::stack<T> &stackToClear) {
-	while (!stackToClear.empty()) {
-		stackToClear.pop();
+		while (!stackToClear.empty()) {
+			stackToClear.pop();
+		}
 	}
-}
 
 } // namespace Utils

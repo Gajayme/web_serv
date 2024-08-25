@@ -97,4 +97,9 @@ bool ft_isspace(char x) {
 	return std::isspace(x);
 }
 
+void configError(const std::string &funkName, const std::string &line, const std::string &error) {
+	std::cout << "ConfigParser::" << funkName << ":: " << error << std::endl << "In line: " << line << std::endl;
+	exit(1);
+}
+
 } // namespace Utils
