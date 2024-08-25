@@ -2,8 +2,8 @@
 
 #include <string>
 #include <vector>
-#include "ServerInfo.h"
-#include "ServConst.h"
+#include "../ServerInfo.h"
+#include "../ServConst.h"
 
 class ConfigParser;
 

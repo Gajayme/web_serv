@@ -1,7 +1,7 @@
 #include "iostream"
 
 #include "LocationState.h"
-#include "Utils.h"
+#include "../Utils.h"
 
 LocationState::LocationState(ConfigParser *configParser):
 ConfigParserState(configParser) {

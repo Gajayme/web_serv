@@ -1,7 +1,7 @@
 #include "iostream"
 
 #include "GlobalState.h"
-#include "Utils.h"
+#include "../Utils.h"
 
 GlobalState::GlobalState(ConfigParser *configParser):
 ConfigParserState(configParser) {

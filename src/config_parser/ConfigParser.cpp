@@ -1,6 +1,6 @@
 #include "ConfigParser.h"
-#include "LocationInfo.h"
-#include "Optional.h"
+#include "../LocationInfo.h"
+#include "../Optional.h"
 #include "GlobalState.h"
 #include "ServerState.h"
 #include "LocationState.h"
@@ -8,8 +8,8 @@
 #include <iostream>
 #include <algorithm>
 #include <fstream>
-#include "ServerInfo.h"
-#include "Utils.h"
+#include "../ServerInfo.h"
+#include "../Utils.h"
 
 namespace {
 

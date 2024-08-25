@@ -1,6 +1,6 @@
 #include "Server.h"
 
-#include "ConfigParser.h"
+#include "config_parser/ConfigParser.h"
 #include "string"
 
 int main() {
